@@ -22,6 +22,11 @@ import type { Pokemon } from './pokemons';
  * físicamente los posts inactivos hace más de 7 días — no hay status='expired' ni
  * filtro por fecha en el feed: un post inactivo simplemente deja de existir.
  *
+ * `username` NO viene del SELECT de user_trades (no hay FK directa entre user_trades
+ * y `profiles`, ambas apuntan a auth.users por separado) — se completa aparte con
+ * app/lib/profiles.ts después de agrupar las filas. Por eso empieza en null en
+ * app/lib/tradeGrouping.ts y cada page.tsx lo rellena tras el fetch de profiles.
+ *
  * Se asume que user_trades sigue el diseño original:
  * create table user_trades (
  *   id uuid primary key default gen_random_uuid(),
@@ -43,11 +48,23 @@ export type TradeStatus = 'active' | 'completed' | 'cancelled';
 export type TradeIntent = 'for_trade' | 'looking_for';
 export type BattleState = 'none' | 'dynamax' | 'gigantamax' | 'shadow' | 'purified';
 
+// Confirmado en producción: pokemon_variants.background_id ya existía (FK a
+// backgrounds) antes de que empezáramos a usarlo. El fondo se trata como texto (un
+// badge, igual que battle_state) en vez de imagen — `backgrounds` no tiene columna
+// de imagen a propósito, se dropeó `icon_url` al pasar de un catálogo chico con
+// miniaturas a este catálogo de ~50 nombres reales agrupados por category.
+export interface BackgroundOption {
+  id: string;
+  name: string;
+  category: string;
+}
+
 export interface PokemonVariant {
   id: string;
   pokemon_id: string;
   is_shiny: boolean;
   battle_state: BattleState;
+  background: BackgroundOption | null;
   pokemon: Pokemon;
 }
 
@@ -55,13 +72,15 @@ export interface TradePost {
   id: string;
   trade_group_id: string;
   user_id: string;
+  username: string | null;
   quantity: number;
   notes: string | null;
+  // Atributo del post completo (no por Pokémon) — se guarda duplicado en todas las
+  // filas del grupo, mismo criterio que quantity/notes.
+  is_spoofer: boolean;
   status: TradeStatus;
   created_at: string;
   updated_at: string;
   offering: PokemonVariant[];
   lookingFor: PokemonVariant[];
 }
-
-export type FeedTab = 'all' | 'for_trade' | 'looking_for';

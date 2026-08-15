@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus, Repeat, Search, X } from 'lucide-react';
-import type { BattleState } from '@/app/types/trades';
+import type { BackgroundOption, BattleState } from '@/app/types/trades';
 import { PokemonSearchPicker, type PokemonSummary } from './PokemonSearchPicker';
 import { VariantConfigurator } from './VariantConfigurator';
 
@@ -12,20 +12,31 @@ export interface TradeSideSlot {
   pokemon: PokemonSummary | null;
   isShiny: boolean;
   battleState: BattleState;
+  background: BackgroundOption | null;
 }
 
 function createEmptySlot(): TradeSideSlot {
-  return { id: crypto.randomUUID(), pokemon: null, isShiny: false, battleState: 'none' };
+  return { id: crypto.randomUUID(), pokemon: null, isShiny: false, battleState: 'none', background: null };
 }
 
 export function createInitialSlots(): TradeSideSlot[] {
   return [createEmptySlot()];
 }
 
+// Filtra los slots que ya tienen un Pokémon elegido (los vacíos son solo el estado
+// del buscador en pantalla, no se publican). Compartido entre /publicar y
+// /publicar/[tradeGroupId]/editar.
+export function configuredSlots(
+  slots: TradeSideSlot[]
+): (TradeSideSlot & { pokemon: PokemonSummary })[] {
+  return slots.filter((slot): slot is TradeSideSlot & { pokemon: PokemonSummary } => slot.pokemon !== null);
+}
+
 interface TradeSideListProps {
   side: 'offer' | 'seek';
   slots: TradeSideSlot[];
   onChange: (slots: TradeSideSlot[]) => void;
+  backgrounds: BackgroundOption[];
 }
 
 const SIDE_COPY: Record<'offer' | 'seek', { label: string; accent: 'blue' | 'red' }> = {
@@ -33,7 +44,7 @@ const SIDE_COPY: Record<'offer' | 'seek', { label: string; accent: 'blue' | 'red
   seek: { label: 'Busco a cambio', accent: 'red' },
 };
 
-export function TradeSideList({ side, slots, onChange }: TradeSideListProps) {
+export function TradeSideList({ side, slots, onChange, backgrounds }: TradeSideListProps) {
   const { label, accent } = SIDE_COPY[side];
   const Icon = side === 'offer' ? Repeat : Search;
   const accentColor = accent === 'blue' ? '#2E9BF5' : '#FF3D3D';
@@ -87,15 +98,22 @@ export function TradeSideList({ side, slots, onChange }: TradeSideListProps) {
                   pokemon={slot.pokemon}
                   isShiny={slot.isShiny}
                   battleState={slot.battleState}
+                  background={slot.background}
+                  backgrounds={backgrounds}
                   accent={accent}
                   onShinyChange={(isShiny) => updateSlot(slot.id, { isShiny })}
                   onBattleStateChange={(battleState) => updateSlot(slot.id, { battleState })}
-                  onClear={() => updateSlot(slot.id, { pokemon: null, isShiny: false, battleState: 'none' })}
+                  onBackgroundChange={(background) => updateSlot(slot.id, { background })}
+                  onClear={() =>
+                    updateSlot(slot.id, { pokemon: null, isShiny: false, battleState: 'none', background: null })
+                  }
                 />
               ) : (
                 <PokemonSearchPicker
                   accent={accent}
-                  onSelect={(pokemon) => updateSlot(slot.id, { pokemon, isShiny: false, battleState: 'none' })}
+                  onSelect={(pokemon) =>
+                    updateSlot(slot.id, { pokemon, isShiny: false, battleState: 'none', background: null })
+                  }
                 />
               )}
             </div>

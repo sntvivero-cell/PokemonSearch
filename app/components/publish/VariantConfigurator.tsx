@@ -1,8 +1,9 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Sparkles } from 'lucide-react';
-import type { BattleState } from '@/app/types/trades';
+import { ChevronDown, Sparkles } from 'lucide-react';
+import type { BackgroundOption, BattleState } from '@/app/types/trades';
 import type { PokemonSummary } from './PokemonSearchPicker';
 
 const BATTLE_STATES: { value: BattleState; label: string }[] = [
@@ -13,12 +14,38 @@ const BATTLE_STATES: { value: BattleState; label: string }[] = [
   { value: 'purified', label: 'Purified' },
 ];
 
+// Mismo orden en el que aparecen en el check constraint de backgrounds.category.
+const CATEGORY_ORDER = [
+  'team',
+  'seasonal',
+  'location',
+  'stadium',
+  'national_trust',
+  'pokelids',
+  'pokemon_center',
+  'other',
+];
+
+const CATEGORY_LABELS: Record<string, string> = {
+  team: 'Equipo',
+  seasonal: 'Temporada / Evento',
+  location: 'Ubicación',
+  stadium: 'Estadio',
+  national_trust: 'National Trust',
+  pokelids: 'PokéLids',
+  pokemon_center: 'Centro Pokémon',
+  other: 'Otros',
+};
+
 interface VariantConfiguratorProps {
   pokemon: PokemonSummary;
   isShiny: boolean;
   battleState: BattleState;
+  background: BackgroundOption | null;
+  backgrounds: BackgroundOption[];
   onShinyChange: (value: boolean) => void;
   onBattleStateChange: (value: BattleState) => void;
+  onBackgroundChange: (value: BackgroundOption | null) => void;
   onClear: () => void;
   accent?: 'blue' | 'red';
 }
@@ -32,11 +59,33 @@ export function VariantConfigurator({
   pokemon,
   isShiny,
   battleState,
+  background,
+  backgrounds,
   onShinyChange,
   onBattleStateChange,
+  onBackgroundChange,
   onClear,
   accent = 'blue',
 }: VariantConfiguratorProps) {
+  const [isBackgroundOpen, setIsBackgroundOpen] = useState(false);
+
+  const groupedBackgrounds = useMemo(() => {
+    const byCategory = new Map<string, BackgroundOption[]>();
+    for (const bg of backgrounds) {
+      if (!byCategory.has(bg.category)) byCategory.set(bg.category, []);
+      byCategory.get(bg.category)!.push(bg);
+    }
+    return CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => ({
+      category,
+      items: byCategory.get(category)!,
+    }));
+  }, [backgrounds]);
+
+  function selectBackground(value: BackgroundOption | null) {
+    onBackgroundChange(value);
+    setIsBackgroundOpen(false);
+  }
+
   return (
     <div className="rounded-xl border border-[#232D38] bg-[#0B0F14] p-4">
       <div className="flex items-center justify-between gap-2">
@@ -108,6 +157,66 @@ export function VariantConfigurator({
           })}
         </div>
       </div>
+
+      {backgrounds.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#5C6773]">Fondo</p>
+          <button
+            type="button"
+            onClick={() => setIsBackgroundOpen((v) => !v)}
+            className="flex w-full items-center justify-between rounded-lg border border-[#232D38] px-3 py-2
+                       text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]"
+          >
+            <span className="truncate">{background?.name ?? 'Sin fondo'}</span>
+            <ChevronDown
+              className={`h-3.5 w-3.5 shrink-0 transition-transform ${isBackgroundOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {isBackgroundOpen && (
+            <div className="mt-1.5 max-h-56 overflow-y-auto rounded-lg border border-[#232D38] bg-[#131A22] p-2">
+              <button
+                type="button"
+                onClick={() => selectBackground(null)}
+                className={`mb-2 rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+                  background === null
+                    ? ACCENT_ACTIVE_PILL[accent]
+                    : 'border border-[#232D38] text-[#8792A0] hover:border-[#3A4C63]'
+                }`}
+              >
+                Sin fondo
+              </button>
+
+              {groupedBackgrounds.map(({ category, items }) => (
+                <div key={category} className="mb-2 last:mb-0">
+                  <p className="mb-1 text-[9px] font-bold uppercase tracking-wide text-[#5C6773]">
+                    {CATEGORY_LABELS[category] ?? category}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {items.map((bg) => {
+                      const isActive = background?.id === bg.id;
+                      return (
+                        <button
+                          key={bg.id}
+                          type="button"
+                          onClick={() => selectBackground(bg)}
+                          className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+                            isActive
+                              ? ACCENT_ACTIVE_PILL[accent]
+                              : 'border border-[#232D38] text-[#8792A0] hover:border-[#3A4C63]'
+                          }`}
+                        >
+                          {bg.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
