@@ -68,9 +68,8 @@ export function groupTradeRows(rows: RawTradeRow[]): TradePost[] {
     if (row.created_at > group.created_at) {
       group.created_at = row.created_at;
     }
-    // El botón "Actualizar" (y ahora también "Editar") hacen su UPDATE/DELETE+INSERT
-    // sobre TODAS las filas del grupo a la vez, así que en la práctica quedan
-    // sincronizadas. Tomamos el máximo igual por robustez.
+    // "Editar" hace su DELETE+INSERT sobre TODAS las filas del grupo a la vez, así que
+    // en la práctica quedan sincronizadas. Tomamos el máximo igual por robustez.
     if (row.updated_at > group.updated_at) {
       group.updated_at = row.updated_at;
     }

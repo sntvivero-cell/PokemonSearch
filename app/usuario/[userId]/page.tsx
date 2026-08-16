@@ -65,12 +65,6 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
     load();
   }, [userId]);
 
-  function handleBumped(tradeGroupId: string, updatedAt: string) {
-    setTrades((prev) =>
-      prev.map((t) => (t.trade_group_id === tradeGroupId ? { ...t, updated_at: updatedAt } : t))
-    );
-  }
-
   function handleDeleted(tradeGroupId: string) {
     setTrades((prev) => prev.filter((t) => t.trade_group_id !== tradeGroupId));
   }
@@ -179,7 +173,6 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                 key={trade.id}
                 trade={trade}
                 currentUserId={currentUser?.id ?? null}
-                onBumped={handleBumped}
                 onDeleted={handleDeleted}
               />
             ))}

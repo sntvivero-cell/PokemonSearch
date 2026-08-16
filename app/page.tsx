@@ -79,12 +79,6 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  function handleBumped(tradeGroupId: string, updatedAt: string) {
-    setTrades((prev) =>
-      prev.map((t) => (t.trade_group_id === tradeGroupId ? { ...t, updated_at: updatedAt } : t))
-    );
-  }
-
   function handleDeleted(tradeGroupId: string) {
     setTrades((prev) => prev.filter((t) => t.trade_group_id !== tradeGroupId));
   }
@@ -212,7 +206,6 @@ export default function HomePage() {
                 key={trade.id}
                 trade={trade}
                 currentUserId={user?.id ?? null}
-                onBumped={handleBumped}
                 onDeleted={handleDeleted}
               />
             ))}

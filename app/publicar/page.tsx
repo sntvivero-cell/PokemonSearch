@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { getOrCreateVariant } from '@/app/lib/variants';
+import { cooldownMessageFromRpcError } from '@/app/lib/tradeTiming';
 import { configuredSlots } from '@/app/components/publish/TradeSideList';
 import { TradeForm, type TradeFormValues } from '@/app/components/publish/TradeForm';
 import { Toast } from '@/app/components/publish/Toast';
@@ -40,11 +41,10 @@ export default function PublishTradePage() {
     // Quantity y notes se guardan duplicados en todas las filas del grupo (criterio más
     // simple): así cualquiera de las filas que se lea por separado conserva la info
     // completa del post, sin depender de cuál fila del grupo se consulte primero.
+    // user_id, status, created_at y updated_at los pone publish_trade_group() sola.
     const tradeGroupId = crypto.randomUUID();
     const rows = [
       ...offeringVariantIds.map((variantId) => ({
-        user_id: user.id,
-        trade_group_id: tradeGroupId,
         variant_id: variantId,
         intent: 'for_trade' as const,
         quantity: values.quantity,
@@ -52,11 +52,8 @@ export default function PublishTradePage() {
         is_spoofer: values.isSpoofer,
         trinket_choice: values.trinketChoice,
         open_to_offers: values.openToOffers,
-        status: 'active' as const,
       })),
       ...seekingVariantIds.map((variantId) => ({
-        user_id: user.id,
-        trade_group_id: tradeGroupId,
         variant_id: variantId,
         intent: 'looking_for' as const,
         quantity: values.quantity,
@@ -64,13 +61,17 @@ export default function PublishTradePage() {
         is_spoofer: values.isSpoofer,
         trinket_choice: values.trinketChoice,
         open_to_offers: values.openToOffers,
-        status: 'active' as const,
       })),
     ];
 
-    const { error: insertError } = await supabase.from('user_trades').insert(rows);
-    if (insertError) {
-      return `No se pudo publicar el trade: ${insertError.message}`;
+    const { error: rpcError } = await supabase.rpc('publish_trade_group', {
+      p_trade_group_id: tradeGroupId,
+      p_rows: rows,
+    });
+    if (rpcError) {
+      const cooldownMessage = cooldownMessageFromRpcError(rpcError, 'publicar');
+      if (cooldownMessage) return cooldownMessage;
+      return `No se pudo publicar el trade: ${rpcError.message}`;
     }
 
     setShowSuccessToast(true);
@@ -101,6 +102,8 @@ export default function PublishTradePage() {
       <TradeForm
         isUserReady={!isUserLoading}
         isLoggedIn={!!user}
+        userId={user?.id ?? null}
+        cooldownActionVerb="publicar"
         submitLabel="Publicar trade"
         submittingLabel="Publicando…"
         onSubmit={handleSubmit}

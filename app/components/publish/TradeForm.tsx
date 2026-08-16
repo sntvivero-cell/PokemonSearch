@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { HelpCircle, MapPin } from 'lucide-react';
 import { fetchBackgrounds } from '@/app/lib/backgrounds';
+import { fetchCooldownRemainingMs, formatDuration } from '@/app/lib/tradeTiming';
 import type { BackgroundOption, TrinketChoice } from '@/app/types/trades';
 import { TradeSideList, configuredSlots, createInitialSlots, type TradeSideSlot } from './TradeSideList';
 
@@ -39,6 +40,11 @@ interface TradeFormProps {
   initialValues?: TradeFormInitialValues;
   isUserReady: boolean;
   isLoggedIn: boolean;
+  // Necesario para chequear el cooldown de 30 min contra sus propias filas — null
+  // mientras isLoggedIn sea false o el usuario todavía no cargó.
+  userId: string | null;
+  // "publicar" o "editar" — para el mensaje "Podés {verbo} de nuevo en X".
+  cooldownActionVerb: string;
   submitLabel: string;
   submittingLabel: string;
   // Devuelve un mensaje de error para mostrar, o null si salió bien (el caller se
@@ -54,6 +60,8 @@ export function TradeForm({
   initialValues,
   isUserReady,
   isLoggedIn,
+  userId,
+  cooldownActionVerb,
   submitLabel,
   submittingLabel,
   onSubmit,
@@ -80,6 +88,43 @@ export function TradeForm({
   useEffect(() => {
     fetchBackgrounds().then(setBackgrounds);
   }, []);
+
+  // Espejo del chequeo de cooldown que hace publish_trade_group() en la base (max
+  // updated_at de TODAS las filas del usuario, sin excluir ningún trade_group_id —
+  // reeditar el mismo post también cuenta). `now` se guarda como estado (en vez de
+  // llamar Date.now() durante el render, que React considera impuro) y solo se
+  // actualiza desde efectos: una vez al resolver el chequeo inicial, y después cada
+  // 30s mientras el cooldown siga activo, para que el texto cuente hacia abajo y el
+  // botón se reactive solo. Es solo UX — la función RPC es la que realmente lo hace
+  // cumplir, así que no pasa nada si esto queda desactualizado (ver
+  // cooldownMessageFromRpcError en el catch del submit real, en cada page.tsx).
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [now, setNow] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isLoggedIn || !userId) return;
+
+    let cancelled = false;
+    fetchCooldownRemainingMs(userId).then((remainingMs) => {
+      if (cancelled) return;
+      const nowMs = Date.now();
+      setNow(nowMs);
+      setCooldownUntil(remainingMs > 0 ? nowMs + remainingMs : null);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, userId]);
+
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const interval = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(interval);
+  }, [cooldownUntil]);
+
+  const cooldownRemainingMs = cooldownUntil && now ? Math.max(0, cooldownUntil - now) : 0;
+  const isInCooldown = cooldownRemainingMs > 0;
 
   const hasAnyPokemon = configuredSlots(offeringSlots).length > 0 || configuredSlots(seekingSlots).length > 0;
 
@@ -119,6 +164,10 @@ export function TradeForm({
       setSubmitError(
         'Agregá al menos un Pokémon en "Busco a cambio" o activá "No busco nada específico (Busco ofertas)".'
       );
+      return;
+    }
+    if (isInCooldown) {
+      setSubmitError(`Podés ${cooldownActionVerb} de nuevo en ${formatDuration(cooldownRemainingMs)}.`);
       return;
     }
 
@@ -264,6 +313,13 @@ export function TradeForm({
         />
       </section>
 
+      {isInCooldown && (
+        <p className="mt-4 rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
+          Podés {cooldownActionVerb} de nuevo en {formatDuration(cooldownRemainingMs)} — solo se puede publicar o
+          editar un post cada 30 minutos.
+        </p>
+      )}
+
       {submitError && (
         <p
           className="mt-4 rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs
@@ -283,11 +339,15 @@ export function TradeForm({
         </Link>
         <button
           type="submit"
-          disabled={isSubmitting || !isLoggedIn || !hasAnyPokemon}
+          disabled={isSubmitting || !isLoggedIn || !hasAnyPokemon || isInCooldown}
           className="flex-1 rounded-full bg-[#2E9BF5] px-5 py-2.5 text-xs font-semibold text-white
                      transition hover:bg-[#2589db] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? submittingLabel : submitLabel}
+          {isSubmitting
+            ? submittingLabel
+            : isInCooldown
+              ? `Disponible en ${formatDuration(cooldownRemainingMs)}`
+              : submitLabel}
         </button>
       </div>
     </form>

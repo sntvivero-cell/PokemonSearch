@@ -1,21 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles, User, ArrowLeftRight, RefreshCw, Pencil, Trash2, Mountain, MapPin, HelpCircle } from 'lucide-react';
+import { Sparkles, User, ArrowLeftRight, Pencil, Trash2, Mountain, MapPin, HelpCircle } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
-import { formatDuration, msUntilNextBump } from '@/app/lib/tradeTiming';
 import { timeAgo } from '@/app/lib/timeAgo';
 import { PokemonDetailPopover } from '@/app/components/trades/PokemonDetailPopover';
 import type { TradePost, PokemonVariant } from '@/app/types/trades';
 
 interface TradeCardProps {
   trade: TradePost;
-  // Sin usuario logueado no se muestra ni "Actualizar" ni "Editar"/"Eliminar", aunque
-  // el post sea propio.
+  // Sin usuario logueado no se muestra "Editar"/"Eliminar", aunque el post sea propio.
   currentUserId?: string | null;
-  onBumped?: (tradeGroupId: string, updatedAt: string) => void;
   onDeleted?: (tradeGroupId: string) => void;
 }
 
@@ -105,56 +102,11 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
   );
 }
 
-export function TradeCard({ trade, currentUserId, onBumped, onDeleted }: TradeCardProps) {
+export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
   const isOwner = currentUserId != null && trade.user_id === currentUserId;
 
-  // Se re-renderiza cada 30s solo si hace falta ir contando el cooldown en pantalla;
-  // sin esto el texto "Podés actualizar en X" quedaría congelado hasta la próxima
-  // acción del usuario en la página.
-  const [, forceTick] = useState(0);
-  useEffect(() => {
-    if (!isOwner) return;
-    const interval = setInterval(() => forceTick((n) => n + 1), 30_000);
-    return () => clearInterval(interval);
-  }, [isOwner]);
-
-  const [isBumping, setIsBumping] = useState(false);
-  const [bumpError, setBumpError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  const remainingMs = msUntilNextBump(trade.updated_at);
-  const canBump = remainingMs <= 0;
-
-  async function handleBump() {
-    setBumpError(null);
-    setIsBumping(true);
-
-    // UPDATE trivial (quantity al mismo valor) sobre todas las filas del grupo. El
-    // trigger de la base pisa updated_at con now(); lo mandamos también explícito acá
-    // por si el trigger no estuviera aplicado. La policy RESTRICTIVE de UPDATE en
-    // user_trades es la que realmente hace cumplir el cooldown de 30 min y el
-    // ownership — esto de acá es solo para no dejar que el intento falle en silencio.
-    const { data, error } = await supabase
-      .from('user_trades')
-      .update({ quantity: trade.quantity, updated_at: new Date().toISOString() })
-      .eq('trade_group_id', trade.trade_group_id)
-      .eq('user_id', trade.user_id)
-      .select('updated_at');
-
-    setIsBumping(false);
-
-    if (error) {
-      setBumpError(`No se pudo actualizar: ${error.message}`);
-      return;
-    }
-    if (!data || data.length === 0) {
-      setBumpError('Todavía no se puede actualizar este post (esperá el tiempo de espera).');
-      return;
-    }
-
-    onBumped?.(trade.trade_group_id, data[0].updated_at);
-  }
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -274,32 +226,6 @@ export function TradeCard({ trade, currentUserId, onBumped, onDeleted }: TradeCa
         <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
           {deleteError}
         </p>
-      )}
-
-      {isOwner && (
-        <div className="mt-2.5 border-t border-[#232D38] pt-2.5">
-          {bumpError && (
-            <p className="mb-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
-              {bumpError}
-            </p>
-          )}
-          <button
-            type="button"
-            onClick={handleBump}
-            disabled={!canBump || isBumping}
-            className="flex w-full items-center justify-center gap-1.5 rounded-full border border-[#2E9BF5]/40
-                       bg-[#2E9BF5]/10 px-3 py-1.5 text-[11px] font-semibold text-[#2E9BF5] transition
-                       hover:bg-[#2E9BF5]/20 disabled:cursor-not-allowed disabled:opacity-50
-                       disabled:hover:bg-[#2E9BF5]/10"
-          >
-            <RefreshCw className={`h-3 w-3 ${isBumping ? 'animate-spin' : ''}`} />
-            {isBumping
-              ? 'Actualizando…'
-              : canBump
-                ? 'Actualizar'
-                : `Podés actualizar en ${formatDuration(remainingMs)}`}
-          </button>
-        </div>
       )}
     </article>
   );

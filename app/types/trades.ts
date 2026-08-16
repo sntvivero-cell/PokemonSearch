@@ -15,12 +15,14 @@ import type { Pokemon } from './pokemons';
  * cargó qué busca) y varios del otro. También cubre las filas insertadas ANTES del
  * soporte multi-Pokémon, que quedaron como un array de un solo elemento.
  *
- * `updated_at` (agregada vía migración, con trigger que la refresca en cada UPDATE)
- * se usa para el cooldown de 30 minutos del botón "Actualizar" (ver
- * app/lib/tradeTiming.ts), reforzado por una policy RESTRICTIVE de UPDATE en la base.
- * También es lo que usa app/api/cleanup/route.ts (cron externo diario) para borrar
- * físicamente los posts inactivos hace más de 7 días — no hay status='expired' ni
- * filtro por fecha en el feed: un post inactivo simplemente deja de existir.
+ * `updated_at` (agregada vía migración; se refresca sola con cada INSERT nuevo,
+ * default now(), ya no hay UPDATE de por medio) es lo que usa
+ * app/api/cleanup/route.ts (cron externo diario) para borrar físicamente los posts
+ * inactivos hace más de 7 días — no hay status='expired' ni filtro por fecha en el
+ * feed: un post inactivo simplemente deja de existir. También es la columna que
+ * chequea la policy RESTRICTIVE de INSERT para el cooldown único de 30 minutos entre
+ * publicar y editar (ver app/lib/tradeTiming.ts) — ya no existe el botón "Actualizar"
+ * ni la policy de UPDATE que tenía antes.
  *
  * `username` NO viene del SELECT de user_trades (no hay FK directa entre user_trades
  * y `profiles`, ambas apuntan a auth.users por separado) — se completa aparte con
