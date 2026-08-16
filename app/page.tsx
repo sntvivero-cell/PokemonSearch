@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
@@ -98,9 +99,12 @@ export default function HomePage() {
     <main className="min-h-screen bg-[#0B0F14] text-[#F4F6F8]">
       <header className="sticky top-0 z-10 border-b border-[#232D38] bg-[#0B0F14]/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div>
-            <h1 className="text-lg font-extrabold tracking-tight">Pokémon GO Trades 🚀</h1>
-            <p className="text-xs text-[#5C6773]">Tablón de intercambios de la comunidad</p>
+          <div className="flex items-center gap-2.5">
+            <Image src="/logo-1024.png" alt="GoTraders" width={36} height={36} className="rounded-lg" />
+            <div>
+              <h1 className="text-lg font-extrabold tracking-tight">GoTraders</h1>
+              <p className="text-xs text-[#5C6773]">Tablón de intercambios de la comunidad</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {!isUserLoading && (
