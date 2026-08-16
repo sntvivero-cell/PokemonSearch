@@ -92,7 +92,7 @@ export function VariantConfigurator({
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-14 w-14 shrink-0">
             <Image
-              src={pokemon.sprite_url ?? '/sprites/unknown.png'}
+              src={(isShiny ? pokemon.shiny_sprite_url : null) ?? pokemon.sprite_url ?? '/sprites/unknown.png'}
               alt={pokemon.name}
               fill
               sizes="56px"

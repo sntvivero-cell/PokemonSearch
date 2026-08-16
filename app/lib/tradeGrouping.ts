@@ -8,7 +8,7 @@ export const TRADE_SELECT = `
   variant:pokemon_variants!variant_id (
     id, pokemon_id, is_shiny, battle_state,
     background:backgrounds ( id, name, category ),
-    pokemon:pokemons ( id, dex_number, name, sprite_url, types )
+    pokemon:pokemons ( id, dex_number, name, sprite_url, shiny_sprite_url, types )
   )
 `;
 

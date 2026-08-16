@@ -41,7 +41,7 @@ function VariantThumb({ variant }: { variant: PokemonVariant }) {
     >
       <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12">
         <Image
-          src={pokemon.sprite_url ?? '/sprites/unknown.png'}
+          src={(variant.is_shiny ? pokemon.shiny_sprite_url : null) ?? pokemon.sprite_url ?? '/sprites/unknown.png'}
           alt={pokemon.name}
           fill
           sizes="48px"

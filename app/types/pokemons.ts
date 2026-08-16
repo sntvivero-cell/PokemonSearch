@@ -8,6 +8,7 @@ export interface Pokemon {
   form: string;
   types: string[];
   sprite_url: string | null;
+  shiny_sprite_url: string | null;
 }
 
 export interface Costume {

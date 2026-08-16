@@ -30,6 +30,7 @@ interface ApiAssetForm {
   costume: string | null;
   isFemale: boolean;
   image?: string | null;
+  shinyImage?: string | null;
 }
 
 // Forma de una entrada de pokédex (base, regionForm o megaEvolution comparten esta
@@ -55,6 +56,7 @@ interface PokemonRow {
   dex_number: number;
   name: string;
   sprite_url: string | null;
+  shiny_sprite_url: string | null;
   types: string[];
   form: string;
 }
@@ -77,22 +79,21 @@ function titleCaseForm(suffix: string): string {
 // Unown) aunque el sprite SÍ existe en el array `assetForms` del Pokémon base — ahí
 // queda indexado por su form key completa (ej. "UNOWN_A") o por el sufijo solo (ej.
 // "ALOLA"), sin un criterio único entre especies. Probamos ambas antes de rendirnos.
-function findFallbackImage(
+function findFallbackAssetForm(
   assetForms: ApiAssetForm[] | undefined,
   fullKey: string,
   suffix: string
-): string | null {
-  const match = (assetForms ?? []).find(
+): ApiAssetForm | undefined {
+  return (assetForms ?? []).find(
     (af) => !af.costume && !af.isFemale && (af.form === fullKey || af.form === suffix)
   );
-  return match?.image ?? null;
 }
 
 function toRow(
   entry: ApiSpeciesLike,
   dexNumber: number,
   form: string,
-  spriteFallback: string | null = null
+  spriteFallback: ApiAssetForm | undefined = undefined
 ): PokemonRow {
   const types = [typeToDbValue(entry.primaryType), typeToDbValue(entry.secondaryType)].filter(
     (t): t is string => t !== null
@@ -101,7 +102,8 @@ function toRow(
   return {
     dex_number: dexNumber,
     name: entry.names.English,
-    sprite_url: entry.assets?.image ?? spriteFallback,
+    sprite_url: entry.assets?.image ?? spriteFallback?.image ?? null,
+    shiny_sprite_url: entry.assets?.shinyImage ?? spriteFallback?.shinyImage ?? null,
     types,
     form,
   };
@@ -116,7 +118,7 @@ function buildRows(pokedex: ApiPokemon[]): PokemonRow[] {
     if (p.regionForms && !Array.isArray(p.regionForms)) {
       for (const [formId, nested] of Object.entries(p.regionForms)) {
         const suffix = formId.slice(p.id.length + 1);
-        const fallback = findFallbackImage(p.assetForms, formId, suffix);
+        const fallback = findFallbackAssetForm(p.assetForms, formId, suffix);
         rows.push(toRow(nested, p.dexNr, titleCaseForm(suffix), fallback));
       }
     }
@@ -124,7 +126,7 @@ function buildRows(pokedex: ApiPokemon[]): PokemonRow[] {
     if (p.megaEvolutions && !Array.isArray(p.megaEvolutions)) {
       for (const [megaKey, nested] of Object.entries(p.megaEvolutions)) {
         const suffix = megaKey.slice(p.id.length + 1);
-        const fallback = findFallbackImage(p.assetForms, megaKey, suffix);
+        const fallback = findFallbackAssetForm(p.assetForms, megaKey, suffix);
         rows.push(toRow(nested, p.dexNr, titleCaseForm(suffix), fallback));
       }
     }

@@ -33,6 +33,7 @@ function variantToSlot(variant: PokemonVariant): TradeSideSlot {
     dex_number: variant.pokemon.dex_number,
     name: variant.pokemon.name,
     sprite_url: variant.pokemon.sprite_url,
+    shiny_sprite_url: variant.pokemon.shiny_sprite_url,
   };
 
   return {
@@ -82,7 +83,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
           variant:pokemon_variants!variant_id (
             id, pokemon_id, is_shiny, battle_state,
             background:backgrounds ( id, name, category ),
-            pokemon:pokemons ( id, dex_number, name, sprite_url, types )
+            pokemon:pokemons ( id, dex_number, name, sprite_url, shiny_sprite_url, types )
           )
         `
         )

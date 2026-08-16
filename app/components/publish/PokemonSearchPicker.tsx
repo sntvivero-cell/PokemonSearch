@@ -5,14 +5,16 @@ import Image from 'next/image';
 import { Search, Loader2 } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 
-// Solo las columnas confirmadas en `pokemons` (id, dex_number, name, sprite_url).
-// No se usa el tipo `Pokemon` de app/types/pokemons.ts porque ese incluye un campo
-// `form` que no está en el esquema confirmado y que aquí no se selecciona.
+// Solo las columnas confirmadas en `pokemons` (id, dex_number, name, sprite_url,
+// shiny_sprite_url). No se usa el tipo `Pokemon` de app/types/pokemons.ts porque ese
+// incluye un campo `form` que no está en el esquema confirmado y que aquí no se
+// selecciona.
 export interface PokemonSummary {
   id: string;
   dex_number: number;
   name: string;
   sprite_url: string | null;
+  shiny_sprite_url: string | null;
 }
 
 interface PokemonSearchPickerProps {
@@ -46,7 +48,7 @@ export function PokemonSearchPicker({ onSelect, accent = 'blue' }: PokemonSearch
 
       let request = supabase
         .from('pokemons')
-        .select('id, dex_number, name, sprite_url')
+        .select('id, dex_number, name, sprite_url, shiny_sprite_url')
         .order('dex_number', { ascending: true })
         .limit(24);
 
