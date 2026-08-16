@@ -11,7 +11,7 @@ import { configuredSlots, type TradeSideSlot } from '@/app/components/publish/Tr
 import type { PokemonSummary } from '@/app/components/publish/PokemonSearchPicker';
 import { TradeForm, type TradeFormValues } from '@/app/components/publish/TradeForm';
 import { Toast } from '@/app/components/publish/Toast';
-import type { PokemonVariant, TradeIntent } from '@/app/types/trades';
+import type { PokemonVariant, TradeIntent, TrinketChoice } from '@/app/types/trades';
 
 interface EditTradePageProps {
   params: Promise<{ tradeGroupId: string }>;
@@ -23,6 +23,8 @@ interface RawGroupRow {
   quantity: number;
   notes: string | null;
   is_spoofer: boolean;
+  trinket_choice: TrinketChoice;
+  open_to_offers: boolean;
   created_at: string;
   variant: PokemonVariant;
 }
@@ -58,6 +60,8 @@ export default function EditTradePage({ params }: EditTradePageProps) {
   const [initialQuantity, setInitialQuantity] = useState(1);
   const [initialNotes, setInitialNotes] = useState('');
   const [initialIsSpoofer, setInitialIsSpoofer] = useState(false);
+  const [initialTrinketChoice, setInitialTrinketChoice] = useState<TrinketChoice>('none');
+  const [initialOpenToOffers, setInitialOpenToOffers] = useState(false);
   const [originalCreatedAt, setOriginalCreatedAt] = useState<string | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
 
@@ -79,7 +83,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
         .from('user_trades')
         .select(
           `
-          user_id, intent, quantity, notes, is_spoofer, created_at,
+          user_id, intent, quantity, notes, is_spoofer, trinket_choice, open_to_offers, created_at,
           variant:pokemon_variants!variant_id (
             id, pokemon_id, is_shiny, battle_state,
             background:backgrounds ( id, name, category ),
@@ -114,6 +118,8 @@ export default function EditTradePage({ params }: EditTradePageProps) {
       setInitialQuantity(rows[0].quantity);
       setInitialNotes(rows[0].notes ?? '');
       setInitialIsSpoofer(rows[0].is_spoofer);
+      setInitialTrinketChoice(rows[0].trinket_choice);
+      setInitialOpenToOffers(rows[0].open_to_offers);
       setOriginalCreatedAt(rows[0].created_at);
       setIsLoadingGroup(false);
     }
@@ -174,6 +180,8 @@ export default function EditTradePage({ params }: EditTradePageProps) {
         quantity: values.quantity,
         notes: values.notes.trim() || null,
         is_spoofer: values.isSpoofer,
+        trinket_choice: values.trinketChoice,
+        open_to_offers: values.openToOffers,
         status: 'active' as const,
         created_at: originalCreatedAt,
       })),
@@ -185,6 +193,8 @@ export default function EditTradePage({ params }: EditTradePageProps) {
         quantity: values.quantity,
         notes: values.notes.trim() || null,
         is_spoofer: values.isSpoofer,
+        trinket_choice: values.trinketChoice,
+        open_to_offers: values.openToOffers,
         status: 'active' as const,
         created_at: originalCreatedAt,
       })),
@@ -261,6 +271,8 @@ export default function EditTradePage({ params }: EditTradePageProps) {
           quantity: initialQuantity,
           notes: initialNotes,
           isSpoofer: initialIsSpoofer,
+          trinketChoice: initialTrinketChoice,
+          openToOffers: initialOpenToOffers,
         }}
         isUserReady={!isUserLoading}
         isLoggedIn={!!user}

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { LogIn, LogOut, MessageCircle, Plus, Search } from 'lucide-react';
+import { LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { fetchUsernames } from '@/app/lib/profiles';
@@ -150,6 +150,16 @@ export default function HomePage() {
                     {unreadConversations > 9 ? '9+' : unreadConversations}
                   </span>
                 )}
+              </Link>
+            )}
+            {user && (
+              <Link
+                href="/configuracion"
+                aria-label="Configuración"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#232D38]
+                           text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
+              >
+                <Settings className="h-3.5 w-3.5" />
               </Link>
             )}
             <Link

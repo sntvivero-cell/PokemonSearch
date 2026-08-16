@@ -50,6 +50,8 @@ export default function PublishTradePage() {
         quantity: values.quantity,
         notes: values.notes.trim() || null,
         is_spoofer: values.isSpoofer,
+        trinket_choice: values.trinketChoice,
+        open_to_offers: values.openToOffers,
         status: 'active' as const,
       })),
       ...seekingVariantIds.map((variantId) => ({
@@ -60,6 +62,8 @@ export default function PublishTradePage() {
         quantity: values.quantity,
         notes: values.notes.trim() || null,
         is_spoofer: values.isSpoofer,
+        trinket_choice: values.trinketChoice,
+        open_to_offers: values.openToOffers,
         status: 'active' as const,
       })),
     ];

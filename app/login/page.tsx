@@ -9,12 +9,16 @@ import { supabase } from '@/app/lib/supabaseClient';
 
 type AuthMode = 'login' | 'signup';
 
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 20;
+
 export default function LoginPage() {
   const router = useRouter();
 
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,9 +28,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setConfirmEmailNotice(false);
-    setIsSubmitting(true);
 
     if (mode === 'login') {
+      setIsSubmitting(true);
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
         setError(signInError.message);
@@ -37,9 +41,50 @@ export default function LoginPage() {
       return;
     }
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      setError('Elegí un nombre de usuario.');
+      return;
+    }
+    if (trimmedUsername.length < USERNAME_MIN_LENGTH || trimmedUsername.length > USERNAME_MAX_LENGTH) {
+      setError(`El nombre de usuario debe tener entre ${USERNAME_MIN_LENGTH} y ${USERNAME_MAX_LENGTH} caracteres.`);
+      return;
+    }
+    if (/\s/.test(trimmedUsername)) {
+      setError('El nombre de usuario no puede tener espacios.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Chequeo previo contra profiles (SELECT es público) para dar un mensaje claro
+    // antes de intentar crear la cuenta. profiles.username tiene una unique
+    // constraint, así que si dos personas pasan este chequeo a la vez y chocan
+    // igual, el catch de abajo (mensaje genérico "Database error saving new user"
+    // que Supabase devuelve cuando el trigger handle_new_user falla) es el respaldo.
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('username', trimmedUsername)
+      .maybeSingle();
+
+    if (existingProfile) {
+      setError('Ese nombre de usuario ya está en uso.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { username: trimmedUsername } },
+    });
     if (signUpError) {
-      setError(signUpError.message);
+      if (/database error/i.test(signUpError.message)) {
+        setError('Ese nombre de usuario ya está en uso.');
+      } else {
+        setError(signUpError.message);
+      }
       setIsSubmitting(false);
       return;
     }
@@ -113,6 +158,24 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            {mode === 'signup' && (
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Nombre de usuario</label>
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  minLength={USERNAME_MIN_LENGTH}
+                  maxLength={USERNAME_MAX_LENGTH}
+                  placeholder="ej. AshKetchum10"
+                  className="w-full rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2 text-sm
+                             text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
+                             focus:border-[#2E9BF5]"
+                />
+              </div>
+            )}
+
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Email</label>
               <input

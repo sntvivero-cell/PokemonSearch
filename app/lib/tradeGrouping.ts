@@ -1,10 +1,10 @@
-import type { PokemonVariant, TradeIntent, TradePost, TradeStatus } from '@/app/types/trades';
+import type { PokemonVariant, TradeIntent, TradePost, TradeStatus, TrinketChoice } from '@/app/types/trades';
 
 // user_trades.variant_id -> pokemon_variants.id -> pokemon_variants.pokemon_id -> pokemons.id
 // (confirmado vía information_schema). Si tu columna de variante se llama distinto
 // a `variant_id`, o pokemon_variants no expone `pokemon_id`, ajusta este SELECT.
 export const TRADE_SELECT = `
-  id, user_id, trade_group_id, intent, quantity, notes, is_spoofer, status, created_at, updated_at,
+  id, user_id, trade_group_id, intent, quantity, notes, is_spoofer, trinket_choice, open_to_offers, status, created_at, updated_at,
   variant:pokemon_variants!variant_id (
     id, pokemon_id, is_shiny, battle_state,
     background:backgrounds ( id, name, category ),
@@ -20,6 +20,8 @@ export interface RawTradeRow {
   quantity: number;
   notes: string | null;
   is_spoofer: boolean;
+  trinket_choice: TrinketChoice;
+  open_to_offers: boolean;
   status: TradeStatus;
   created_at: string;
   updated_at: string;
@@ -46,6 +48,8 @@ export function groupTradeRows(rows: RawTradeRow[]): TradePost[] {
         quantity: row.quantity,
         notes: row.notes,
         is_spoofer: row.is_spoofer,
+        trinket_choice: row.trinket_choice,
+        open_to_offers: row.open_to_offers,
         status: row.status,
         created_at: row.created_at,
         updated_at: row.updated_at,

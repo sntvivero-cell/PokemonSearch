@@ -2,11 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin } from 'lucide-react';
+import { HelpCircle, MapPin } from 'lucide-react';
 import { fetchBackgrounds } from '@/app/lib/backgrounds';
-import type { BackgroundOption } from '@/app/types/trades';
+import type { BackgroundOption, TrinketChoice } from '@/app/types/trades';
 import { TradeSideList, configuredSlots, createInitialSlots, type TradeSideSlot } from './TradeSideList';
+
+const TRINKET_OPTIONS: { value: TrinketChoice; label: string }[] = [
+  { value: 'none', label: 'Sin trinket' },
+  { value: 'self', label: 'Mi trinket' },
+  { value: 'other', label: 'Tu trinket' },
+];
 
 export interface TradeFormValues {
   offering: TradeSideSlot[];
@@ -14,6 +21,8 @@ export interface TradeFormValues {
   quantity: number;
   notes: string;
   isSpoofer: boolean;
+  trinketChoice: TrinketChoice;
+  openToOffers: boolean;
 }
 
 export interface TradeFormInitialValues {
@@ -22,6 +31,8 @@ export interface TradeFormInitialValues {
   quantity: number;
   notes: string;
   isSpoofer: boolean;
+  trinketChoice: TrinketChoice;
+  openToOffers: boolean;
 }
 
 interface TradeFormProps {
@@ -57,6 +68,8 @@ export function TradeForm({
   const [quantity, setQuantity] = useState(initialValues?.quantity ?? 1);
   const [notes, setNotes] = useState(initialValues?.notes ?? '');
   const [isSpoofer, setIsSpoofer] = useState(initialValues?.isSpoofer ?? false);
+  const [trinketChoice, setTrinketChoice] = useState<TrinketChoice>(initialValues?.trinketChoice ?? 'none');
+  const [openToOffers, setOpenToOffers] = useState(initialValues?.openToOffers ?? false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -70,6 +83,26 @@ export function TradeForm({
 
   const hasAnyPokemon = configuredSlots(offeringSlots).length > 0 || configuredSlots(seekingSlots).length > 0;
 
+  // "Busco ofertas" y elegir Pokémon puntuales en "Busco a cambio" son mutuamente
+  // excluyentes — no tiene sentido pedir algo específico y a la vez aceptar cualquier
+  // oferta. Al activar, si ya había Pokémon cargados ahí, se confirma antes de
+  // perderlos (no hay forma de "pausarlos": si el usuario se arrepiente, cancela acá).
+  function handleToggleOpenToOffers() {
+    if (openToOffers) {
+      setOpenToOffers(false);
+      return;
+    }
+
+    if (configuredSlots(seekingSlots).length > 0) {
+      const confirmed = window.confirm(
+        'Esto va a quitar los Pokémon que elegiste en "Busco a cambio", ¿continuar?'
+      );
+      if (!confirmed) return;
+      setSeekingSlots(createInitialSlots());
+    }
+    setOpenToOffers(true);
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError(null);
@@ -82,9 +115,23 @@ export function TradeForm({
       setSubmitError('Agregá al menos un Pokémon en "Ofrezco" o en "Busco a cambio".');
       return;
     }
+    if (!openToOffers && configuredSlots(seekingSlots).length === 0) {
+      setSubmitError(
+        'Agregá al menos un Pokémon en "Busco a cambio" o activá "No busco nada específico (Busco ofertas)".'
+      );
+      return;
+    }
 
     setIsSubmitting(true);
-    const error = await onSubmit({ offering: offeringSlots, seeking: seekingSlots, quantity, notes, isSpoofer });
+    const error = await onSubmit({
+      offering: offeringSlots,
+      seeking: seekingSlots,
+      quantity,
+      notes,
+      isSpoofer,
+      trinketChoice,
+      openToOffers,
+    });
     setIsSubmitting(false);
     if (error) setSubmitError(error);
   }
@@ -107,7 +154,31 @@ export function TradeForm({
         <p className="mb-3 text-[11px] text-[#5C6773]">Podés agregar hasta 10 Pokémon distintos por lado.</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <TradeSideList side="offer" slots={offeringSlots} onChange={setOfferingSlots} backgrounds={backgrounds} />
-          <TradeSideList side="seek" slots={seekingSlots} onChange={setSeekingSlots} backgrounds={backgrounds} />
+          <div className="flex flex-1 flex-col">
+            <button
+              type="button"
+              onClick={handleToggleOpenToOffers}
+              className={`mb-2 flex w-full items-center justify-between rounded-lg border px-3 py-2 text-xs
+                         font-semibold transition ${
+                           openToOffers
+                             ? 'border-[#FF3D3D]/60 bg-[#FF3D3D]/10 text-[#FF3D3D]'
+                             : 'border-[#232D38] text-[#8792A0] hover:border-[#3A4C63]'
+                         }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <HelpCircle className="h-3.5 w-3.5" />
+                No busco nada específico (Busco ofertas)
+              </span>
+              <span>{openToOffers ? 'Activado' : 'Desactivado'}</span>
+            </button>
+            <TradeSideList
+              side="seek"
+              slots={seekingSlots}
+              onChange={setSeekingSlots}
+              backgrounds={backgrounds}
+              disabled={openToOffers}
+            />
+          </div>
         </div>
       </section>
 
@@ -143,6 +214,39 @@ export function TradeForm({
           </button>
           <p className="mt-1.5 text-[11px] text-[#5C6773]">
             Marca esto si usás apps de ubicación falsa para jugar.
+          </p>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-1.5 text-xs font-semibold text-[#8792A0]">Trinket</p>
+          <div className="flex flex-wrap gap-1.5">
+            {TRINKET_OPTIONS.map((option) => {
+              const isActive = trinketChoice === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setTrinketChoice(option.value)}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+                    isActive
+                      ? 'bg-[#2E9BF5] text-white'
+                      : 'border border-[#232D38] text-[#8792A0] hover:border-[#3A4C63]'
+                  }`}
+                >
+                  <Image
+                    src="/trinket2.jpg"
+                    alt=""
+                    width={18}
+                    height={18}
+                    className={`object-contain ${option.value === 'none' ? 'opacity-40' : ''}`}
+                  />
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-1.5 text-[11px] text-[#5C6773]">
+            El trinket garantiza que el intercambio sea con suerte.
           </p>
         </div>
 

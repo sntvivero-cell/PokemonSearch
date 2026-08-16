@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles, User, ArrowLeftRight, RefreshCw, Pencil, Trash2, Mountain, MapPin } from 'lucide-react';
+import { Sparkles, User, ArrowLeftRight, RefreshCw, Pencil, Trash2, Mountain, MapPin, HelpCircle } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { formatDuration, msUntilNextBump } from '@/app/lib/tradeTiming';
 import { timeAgo } from '@/app/lib/timeAgo';
+import { PokemonDetailPopover } from '@/app/components/trades/PokemonDetailPopover';
 import type { TradePost, PokemonVariant } from '@/app/types/trades';
 
 interface TradeCardProps {
@@ -33,11 +34,11 @@ function VariantThumb({ variant }: { variant: PokemonVariant }) {
   const { pokemon } = variant;
 
   return (
-    <div
-      title={`${pokemon.name}${variant.is_shiny ? ' ✦ shiny' : ''}${
-        variant.battle_state !== 'none' ? ` · ${BATTLE_LABEL[variant.battle_state]}` : ''
-      }${variant.background ? ` · Fondo: ${variant.background.name}` : ''}`}
-      className="flex flex-col items-center gap-0.5 rounded-lg border border-[#232D38] bg-[#131A22] p-1 text-center"
+    <PokemonDetailPopover
+      variant={variant}
+      className="flex cursor-pointer flex-col items-center gap-0.5 rounded-lg border border-[#232D38]
+                 bg-[#131A22] p-1 text-center outline-none transition hover:border-[#3A4C63]
+                 focus-visible:border-[#2E9BF5]"
     >
       <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12">
         <Image
@@ -60,11 +61,22 @@ function VariantThumb({ variant }: { variant: PokemonVariant }) {
           {variant.background && <Mountain className="h-2 w-2 shrink-0 text-[#2E9BF5]" />}
         </div>
       )}
-    </div>
+    </PokemonDetailPopover>
   );
 }
 
-function VariantSide({ variants }: { variants: PokemonVariant[] }) {
+function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; openToOffers?: boolean }) {
+  if (openToOffers) {
+    return (
+      <div className="flex-1 rounded-xl border border-[#232D38] bg-[#0B0F14] p-2">
+        <div className="flex h-full flex-col items-center justify-center gap-1 rounded-lg border border-[#232D38] bg-[#131A22] px-2 py-4 text-center">
+          <HelpCircle className="h-5 w-5 shrink-0 text-[#FF3D3D]" />
+          <span className="text-[10px] font-bold uppercase tracking-wide text-[#FF3D3D]">Busco ofertas</span>
+        </div>
+      </div>
+    );
+  }
+
   if (variants.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-[#232D38] px-2 py-4 text-center">
@@ -171,11 +183,21 @@ export function TradeCard({ trade, currentUserId, onBumped, onDeleted }: TradeCa
 
   return (
     <article className="rounded-2xl border border-[#232D38] bg-[#131A22] p-4 transition-colors hover:border-[#3A4C63]">
-      {trade.is_spoofer && (
-        <span className="mb-3 inline-flex items-center gap-1 rounded-full bg-[#FF3D3D]/15 px-2.5 py-1 text-[10px] font-bold uppercase text-[#FF3D3D]">
-          <MapPin className="h-3 w-3" />
-          Fly
-        </span>
+      {(trade.is_spoofer || trade.trinket_choice !== 'none') && (
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          {trade.is_spoofer && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#FF3D3D]/15 px-2.5 py-1 text-[10px] font-bold uppercase text-[#FF3D3D]">
+              <MapPin className="h-3 w-3" />
+              Fly
+            </span>
+          )}
+          {trade.trinket_choice !== 'none' && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#2E9BF5]/15 px-2.5 py-1 text-[10px] font-bold uppercase text-[#2E9BF5]">
+              <Image src="/trinket2.jpg" alt="" width={12} height={12} className="object-contain" />
+              {trade.trinket_choice === 'self' ? 'Mi trinket' : 'Tu trinket'}
+            </span>
+          )}
+        </div>
       )}
 
       <div className="flex items-start gap-2">
@@ -192,7 +214,7 @@ export function TradeCard({ trade, currentUserId, onBumped, onDeleted }: TradeCa
           <p className="mb-1.5 text-center text-[9px] font-bold uppercase tracking-wide text-[#FF3D3D]">
             Busca{trade.lookingFor.length > 0 && ` (${trade.lookingFor.length})`}
           </p>
-          <VariantSide variants={trade.lookingFor} />
+          <VariantSide variants={trade.lookingFor} openToOffers={trade.open_to_offers} />
         </div>
       </div>
 

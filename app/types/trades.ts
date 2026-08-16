@@ -47,6 +47,9 @@ import type { Pokemon } from './pokemons';
 export type TradeStatus = 'active' | 'completed' | 'cancelled';
 export type TradeIntent = 'for_trade' | 'looking_for';
 export type BattleState = 'none' | 'dynamax' | 'gigantamax' | 'shadow' | 'purified';
+// Trinket = objeto que aumenta la chance de intercambio con suerte en Pokémon GO.
+// Igual que is_spoofer, es un valor de todo el post, no de un Pokémon en particular.
+export type TrinketChoice = 'none' | 'self' | 'other';
 
 // Confirmado en producción: pokemon_variants.background_id ya existía (FK a
 // backgrounds) antes de que empezáramos a usarlo. El fondo se trata como texto (un
@@ -78,6 +81,11 @@ export interface TradePost {
   // Atributo del post completo (no por Pokémon) — se guarda duplicado en todas las
   // filas del grupo, mismo criterio que quantity/notes.
   is_spoofer: boolean;
+  trinket_choice: TrinketChoice;
+  // Si es true, `lookingFor` se ignora a efectos de mostrar Pokémon concretos: el
+  // usuario acepta cualquier oferta en ese lado. Son mutuamente excluyentes (ver
+  // TradeForm.tsx), así que en la práctica lookingFor queda vacío cuando esto es true.
+  open_to_offers: boolean;
   status: TradeStatus;
   created_at: string;
   updated_at: string;
