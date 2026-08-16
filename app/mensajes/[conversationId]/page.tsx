@@ -208,8 +208,8 @@ export default function ChatPage({ params }: ChatPageProps) {
   }
 
   return (
-    <main className="flex h-screen flex-col bg-[#0B0F14] text-[#F4F6F8]">
-      <header className="border-b border-[#232D38] bg-[#0B0F14]/90 backdrop-blur-sm">
+    <main className="flex h-dvh flex-col bg-[#0B0F14] text-[#F4F6F8]">
+      <header className="shrink-0 border-b border-[#232D38] bg-[#0B0F14]/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-4">
           <Link
             href="/mensajes"
@@ -229,7 +229,7 @@ export default function ChatPage({ params }: ChatPageProps) {
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-2 overflow-y-auto px-4 py-4">
+      <div className="mx-auto flex w-full min-h-0 max-w-2xl flex-1 flex-col gap-2 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
           <p className="mt-10 text-center text-xs text-[#5C6773]">Todavía no hay mensajes. Escribí el primero.</p>
         ) : (
@@ -254,7 +254,11 @@ export default function ChatPage({ params }: ChatPageProps) {
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSend} className="border-t border-[#232D38] bg-[#0B0F14] px-4 py-3">
+      <form
+        onSubmit={handleSend}
+        className="sticky bottom-0 z-10 shrink-0 border-t border-[#232D38] bg-[#0B0F14] px-4 py-3
+                   [padding-bottom:calc(0.75rem+env(safe-area-inset-bottom))]"
+      >
         <div className="mx-auto flex max-w-2xl items-center gap-2">
           <input
             type="text"
@@ -262,7 +266,8 @@ export default function ChatPage({ params }: ChatPageProps) {
             onChange={(e) => setDraft(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH}
             placeholder="Escribí un mensaje…"
-            className="flex-1 rounded-full border border-[#232D38] bg-[#131A22] px-4 py-2 text-sm
+            style={{ fontSize: '16px' }}
+            className="flex-1 rounded-full border border-[#232D38] bg-[#131A22] px-4 py-2.5
                        text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition focus:border-[#2E9BF5]"
           />
           <button
