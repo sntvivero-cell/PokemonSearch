@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Política de Privacidad — GoTraders',
+  title: 'Política de Privacidad — GoTraderz',
 };
 
 export default function PrivacyPolicyPage() {
@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
         <p className="mb-6 text-xs text-[#5C6773]">Última actualización: agosto de 2026.</p>
 
         <p className="mb-4">
-          Esta política explica qué datos personales recoge <strong className="text-[#F4F6F8]">GoTraders</strong>{' '}
+          Esta política explica qué datos personales recoge <strong className="text-[#F4F6F8]">GoTraderz</strong>{' '}
           (en adelante, &ldquo;la app&rdquo;, &ldquo;el sitio&rdquo; o &ldquo;nosotros&rdquo;), para qué los usa y qué derechos tenés sobre ellos bajo
           el Reglamento General de Protección de Datos (RGPD) de la Unión Europea, en caso de que residas en la UE,
           o bajo la normativa de protección de datos que corresponda a tu país.
@@ -33,16 +33,15 @@ export default function PrivacyPolicyPage() {
 
         <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">1. Responsable del tratamiento</h2>
         <p className="mb-4">
-          GoTraders es un proyecto independiente de fans, gestionado por su propio equipo. Para cualquier
+          GoTraderz es un proyecto independiente de fans, gestionado por su propio equipo. Para cualquier
           consulta sobre esta política o tus datos personales, podés escribir a{' '}
-          <a href="mailto:contacto@tudominio.com" className="text-[#2E9BF5] hover:underline">
-            contacto@tudominio.com
-          </a>{' '}
-          [COMPLETAR: reemplazar por tu email de contacto real].
+          <a href="mailto:contact@gotraderz.com" className="text-[#2E9BF5] hover:underline">
+            contact@gotraderz.com
+          </a>.
         </p>
 
         <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">2. Qué datos recogemos</h2>
-        <p className="mb-2">Para poder usar GoTraders recogemos:</p>
+        <p className="mb-2">Para poder usar GoTraderz recogemos:</p>
         <ul className="mb-4 ml-4 list-disc space-y-1">
           <li>Tu dirección de email, al crear una cuenta.</li>
           <li>El nombre de usuario que elegís al registrarte.</li>
@@ -51,7 +50,7 @@ export default function PrivacyPolicyPage() {
           <li>El contenido de los mensajes que enviás por el chat interno a otros usuarios.</li>
         </ul>
         <p className="mb-4">
-          No recogemos datos de pago (GoTraders no procesa pagos) ni datos de ubicación precisa más allá de lo que
+          No recogemos datos de pago (GoTraderz no procesa pagos) ni datos de ubicación precisa más allá de lo que
           vos mismo escribas en tus publicaciones o mensajes.
         </p>
 
@@ -100,10 +99,10 @@ export default function PrivacyPolicyPage() {
         </ul>
         <p className="mb-4">
           Para ejercer cualquiera de estos derechos, incluyendo el borrado completo de tu cuenta, escribinos a{' '}
-          <a href="mailto:contacto@tudominio.com" className="text-[#2E9BF5] hover:underline">
-            contacto@tudominio.com
+          <a href="mailto:contact@gotraderz.com" className="text-[#2E9BF5] hover:underline">
+            contact@gotraderz.com
           </a>{' '}
-          [COMPLETAR] indicando tu nombre de usuario o email registrado.
+          indicando tu nombre de usuario o email registrado.
         </p>
 
         <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. Cuánto tiempo conservamos tus datos</h2>

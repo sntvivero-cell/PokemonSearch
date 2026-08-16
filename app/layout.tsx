@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GoTraders",
+  title: "GoTraderz",
   description: "Tablón de intercambios de la comunidad de Pokémon GO",
   icons: {
     icon: "/icon-512.png",

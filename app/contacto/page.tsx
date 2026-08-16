@@ -2,11 +2,10 @@ import Link from 'next/link';
 import { ArrowLeft, Mail } from 'lucide-react';
 
 export const metadata = {
-  title: 'Contacto — GoTraders',
+  title: 'Contacto — GoTraderz',
 };
 
-// [COMPLETAR]: reemplazar por el email de contacto real antes de publicar.
-const CONTACT_EMAIL = 'contacto@tudominio.com';
+const CONTACT_EMAIL = 'contact@gotraderz.com';
 
 export default function ContactPage() {
   return (

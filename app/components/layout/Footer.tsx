@@ -15,7 +15,7 @@ export function Footer() {
         </Link>
       </nav>
       <p className="mx-auto max-w-2xl text-center text-[10px] leading-relaxed text-[#5C6773]">
-        GoTraders no está afiliado, respaldado ni asociado con Niantic, Inc., The Pokémon Company, Nintendo o Game
+        GoTraderz no está afiliado, respaldado ni asociado con Niantic, Inc., The Pokémon Company, Nintendo o Game
         Freak. Pokémon y Pokémon GO son marcas registradas de sus respectivos dueños. Este es un proyecto
         independiente de fans, no oficial.
       </p>
