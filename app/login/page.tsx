@@ -23,11 +23,13 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmEmailNotice, setConfirmEmailNotice] = useState(false);
+  const [existingAccountNotice, setExistingAccountNotice] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setConfirmEmailNotice(false);
+    setExistingAccountNotice(false);
 
     if (mode === 'login') {
       setIsSubmitting(true);
@@ -91,6 +93,15 @@ export default function LoginPage() {
 
     setIsSubmitting(false);
 
+    // Con "Confirm email" activado, si el email ya tiene una cuenta Supabase no
+    // devuelve un error (filtrarlo sería un problema de seguridad): responde con un
+    // "usuario" que tiene identities: [] en vez de la identity nueva. Es la única
+    // forma de detectar este caso desde el cliente.
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      setExistingAccountNotice(true);
+      return;
+    }
+
     // Si el proyecto tiene "Confirm email" activado, signUp crea el usuario pero no
     // devuelve una sesión activa hasta que confirme el correo. En ese caso no hay
     // sesión todavía, así que no redirigimos: avisamos que revise su email.
@@ -135,6 +146,7 @@ export default function LoginPage() {
                 setMode('login');
                 setError(null);
                 setConfirmEmailNotice(false);
+                setExistingAccountNotice(false);
               }}
               className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                 mode === 'login' ? 'bg-[#2E9BF5] text-white' : 'text-[#8792A0] hover:text-[#F4F6F8]'
@@ -148,6 +160,7 @@ export default function LoginPage() {
                 setMode('signup');
                 setError(null);
                 setConfirmEmailNotice(false);
+                setExistingAccountNotice(false);
               }}
               className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                 mode === 'signup' ? 'bg-[#2E9BF5] text-white' : 'text-[#8792A0] hover:text-[#F4F6F8]'
@@ -214,6 +227,23 @@ export default function LoginPage() {
             {confirmEmailNotice && (
               <p className="rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
                 Cuenta creada. Revisá tu email para confirmarla antes de iniciar sesión.
+              </p>
+            )}
+
+            {existingAccountNotice && (
+              <p className="rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
+                Ya existe una cuenta con ese email.{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('login');
+                    setExistingAccountNotice(false);
+                    setError(null);
+                  }}
+                  className="underline underline-offset-2 hover:text-white"
+                >
+                  ¿Querés iniciar sesión?
+                </button>
               </p>
             )}
 

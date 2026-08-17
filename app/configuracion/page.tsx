@@ -10,6 +10,7 @@ import { useUser } from '@/app/hooks/useUser';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 20;
+const PASSWORD_MIN_LENGTH = 8;
 
 // Acepta el código con o sin espacios (ej. "1234 5678 9012" o "123456789012") — se
 // valida ignorando espacios, pero se guarda tal cual lo escribió el usuario.
@@ -28,6 +29,12 @@ export default function ConfiguracionPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
 
   useEffect(() => {
     if (isUserLoading) return;
@@ -106,6 +113,35 @@ export default function ConfiguracionPage() {
     setUsername(trimmedUsername);
     setFriendCode(trimmedFriendCode);
     setSaved(true);
+  }
+
+  async function handlePasswordSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    setPasswordError(null);
+    setPasswordSaved(false);
+
+    if (newPassword.length < PASSWORD_MIN_LENGTH) {
+      setPasswordError(`La contraseña debe tener al menos ${PASSWORD_MIN_LENGTH} caracteres.`);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Las contraseñas no coinciden.');
+      return;
+    }
+
+    setIsSavingPassword(true);
+    const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+    setIsSavingPassword(false);
+
+    if (updateError) {
+      setPasswordError(updateError.message);
+      return;
+    }
+
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordSaved(true);
   }
 
   if (isUserLoading || isLoading) {
@@ -187,6 +223,63 @@ export default function ConfiguracionPage() {
                          transition hover:bg-[#2589db] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSaving ? 'Guardando…' : 'Guardar'}
+            </button>
+          </form>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-[#232D38] bg-[#131A22] p-6">
+          <h2 className="mb-4 text-sm font-extrabold tracking-tight">Cambiar contraseña</h2>
+
+          <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Nueva contraseña</label>
+              <input
+                type="password"
+                required
+                minLength={PASSWORD_MIN_LENGTH}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2 text-sm
+                           text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
+                           focus:border-[#2E9BF5]"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Confirmar nueva contraseña</label>
+              <input
+                type="password"
+                required
+                minLength={PASSWORD_MIN_LENGTH}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2 text-sm
+                           text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
+                           focus:border-[#2E9BF5]"
+              />
+            </div>
+
+            {passwordError && (
+              <p className="rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
+                {passwordError}
+              </p>
+            )}
+
+            {passwordSaved && !passwordError && (
+              <p className="rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
+                Contraseña actualizada.
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSavingPassword}
+              className="mt-2 rounded-full bg-[#2E9BF5] px-5 py-2.5 text-xs font-semibold text-white
+                         transition hover:bg-[#2589db] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSavingPassword ? 'Guardando…' : 'Cambiar contraseña'}
             </button>
           </form>
         </div>
