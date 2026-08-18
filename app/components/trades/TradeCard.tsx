@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles, User, ArrowLeftRight, Pencil, Trash2, Mountain, MapPin, HelpCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Sparkles, User, ArrowLeftRight, Pencil, Trash2, Mountain, MapPin, HelpCircle, MessageCircle } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { timeAgo } from '@/app/lib/timeAgo';
+import { getOrCreateConversation } from '@/app/lib/conversations';
 import { PokemonDetailPopover } from '@/app/components/trades/PokemonDetailPopover';
 import { RankBadge } from '@/app/components/trades/RankBadge';
 import type { TradePost, PokemonVariant } from '@/app/types/trades';
@@ -105,9 +107,35 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
 
 export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
   const isOwner = currentUserId != null && trade.user_id === currentUserId;
+  const router = useRouter();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isStartingConversation, setIsStartingConversation] = useState(false);
+  const [conversationError, setConversationError] = useState<string | null>(null);
+
+  // stopPropagation: el botón vive adentro del <Link> al perfil (ver abajo), así que
+  // sin esto el click también dispararía la navegación al perfil.
+  async function handleMessage(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!currentUserId) {
+      router.push('/login');
+      return;
+    }
+
+    setConversationError(null);
+    setIsStartingConversation(true);
+
+    try {
+      const conversationId = await getOrCreateConversation(currentUserId, trade.user_id);
+      router.push(`/mensajes/${conversationId}`);
+    } catch (err) {
+      setConversationError(err instanceof Error ? err.message : 'No se pudo abrir la conversación.');
+      setIsStartingConversation(false);
+    }
+  }
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -181,14 +209,29 @@ export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
 
       <div className="mt-3 flex items-center justify-between border-t border-[#232D38] pt-2.5">
         {trade.username ? (
-          <Link
-            href={`/usuario/${trade.user_id}`}
-            className="flex min-w-0 items-center gap-1.5 text-xs text-[#8792A0] transition hover:text-[#F4F6F8]"
-          >
-            <User className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{trade.username}</span>
-            <RankBadge rank={trade.rank} />
-          </Link>
+          <div className="flex min-w-0 items-center gap-1">
+            <Link
+              href={`/usuario/${trade.user_id}`}
+              className="flex min-w-0 items-center gap-1.5 text-xs text-[#8792A0] transition hover:text-[#F4F6F8]"
+            >
+              <User className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{trade.username}</span>
+              <RankBadge rank={trade.rank} />
+            </Link>
+            {trade.user_id !== currentUserId && (
+              <button
+                type="button"
+                onClick={handleMessage}
+                disabled={isStartingConversation}
+                title="Enviar mensaje"
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border
+                           border-[#232D38] text-[#8792A0] transition hover:border-[#2E9BF5]
+                           hover:text-[#2E9BF5] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <MessageCircle className="h-3 w-3" />
+              </button>
+            )}
+          </div>
         ) : (
           <div className="flex items-center gap-1.5 text-xs text-[#8792A0]">
             <User className="h-3.5 w-3.5" />
@@ -227,6 +270,12 @@ export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
       {deleteError && (
         <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
           {deleteError}
+        </p>
+      )}
+
+      {conversationError && (
+        <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
+          {conversationError}
         </p>
       )}
     </article>
