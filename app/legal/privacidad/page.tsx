@@ -62,14 +62,6 @@ export default function PrivacyPolicyPage() {
           dentro de la Unión Europea (por ejemplo Frankfurt o Irlanda) o fuera de ella, según cómo se haya
           configurado este proyecto en particular.
         </p>
-        <p className="mb-4 rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
-          [COMPLETAR]: confirmá la región exacta de este proyecto de Supabase en el dashboard (Project Settings →
-          General → Region) y reemplazá este párrafo indicando la región específica. Si la región elegida está
-          fuera de la Unión Europea, agregá una mención a las garantías que aplica Supabase para transferencias
-          internacionales de datos (por ejemplo, Cláusulas Contractuales Tipo de la UE), según lo que indique la
-          documentación de Supabase vigente al momento de publicar esta política.
-        </p>
-
         <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">4. Cookies</h2>
         <p className="mb-4">
           Usamos únicamente cookies y almacenamiento local técnicos, estrictamente necesarios para el
