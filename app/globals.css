@@ -23,4 +23,29 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Google Translate fuerza "body { top: Npx !important }" inline al insertar su
+     barra superior; esto lo contrarresta aunque la barra en sí quede oculta abajo. */
+  top: 0 !important;
+}
+
+/* Google Translate Website Translator: oculta la barra/iframe superior y el resaltado
+   amarillo que agrega por defecto (no matchean el diseño oscuro de la app) — la única
+   interfaz visible es el botón custom de LanguageToggleButton.tsx. */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+#google_translate_element {
+  display: none !important;
+}
+
+.goog-te-gadget-icon,
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
 }

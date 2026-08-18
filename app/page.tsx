@@ -14,6 +14,7 @@ import type { TradePost } from '@/app/types/trades';
 import { TradeCard } from '@/app/components/trades/TradeCard';
 import { EmptyState } from '@/app/components/trades/EmptyState';
 import { Toast } from '@/app/components/publish/Toast';
+import { LanguageToggleButton } from '@/app/components/layout/LanguageToggleButton';
 
 // Sin importar mayúsculas/acentos: "pikachu" debe matchear "Pikachú" o "PIKACHU".
 function normalize(value: string): string {
@@ -181,6 +182,7 @@ export default function HomePage() {
                 <Settings className="h-3.5 w-3.5" />
               </Link>
             )}
+            <LanguageToggleButton />
             <Link
               href="/publicar"
               className="flex items-center gap-1.5 rounded-full bg-[#2E9BF5] px-4 py-2 text-xs

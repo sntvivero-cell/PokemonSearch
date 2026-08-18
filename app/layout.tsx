@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "./components/layout/Footer";
 import { CookieConsentBanner } from "./components/layout/CookieConsentBanner";
+import { GoogleTranslate } from "./components/layout/GoogleTranslate";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <GoogleTranslate />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />
