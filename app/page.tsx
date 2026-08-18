@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
-import { supabase } from '@/app/lib/supabaseClient';
+import { supabase, consumeAuthRedirectType } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { fetchProfilesWithRank } from '@/app/lib/profiles';
 import { fetchUnreadConversationCount } from '@/app/lib/conversations';
@@ -12,6 +13,7 @@ import { TRADE_SELECT, groupTradeRows, type RawTradeRow } from '@/app/lib/tradeG
 import type { TradePost } from '@/app/types/trades';
 import { TradeCard } from '@/app/components/trades/TradeCard';
 import { EmptyState } from '@/app/components/trades/EmptyState';
+import { Toast } from '@/app/components/publish/Toast';
 
 // Sin importar mayúsculas/acentos: "pikachu" debe matchear "Pikachú" o "PIKACHU".
 function normalize(value: string): string {
@@ -28,12 +30,25 @@ function tradeMatchesQuery(trade: TradePost, normalizedQuery: string): boolean {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { user, isLoading: isUserLoading } = useUser();
   const [trades, setTrades] = useState<TradePost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [unreadConversations, setUnreadConversations] = useState(0);
+  const [showWelcomeToast, setShowWelcomeToast] = useState(false);
+
+  // Detecta específicamente una confirmación de signup recién hecha (type=signup en el
+  // hash del link del mail, capturado en supabaseClient.ts antes de que el SDK lo
+  // borre solo) — no "hay sesión nueva" en general, así un login normal no dispara
+  // este toast. router.replace limpia cualquier resto de hash/query de la URL para que
+  // no quede visible ni se re-dispare al recargar.
+  useEffect(() => {
+    if (consumeAuthRedirectType() !== 'signup') return;
+    setShowWelcomeToast(true);
+    router.replace('/');
+  }, [router]);
 
   useEffect(() => {
     async function loadUnreadCount() {
@@ -218,6 +233,14 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+      {showWelcomeToast && (
+        <Toast
+          message="🎉 ¡Bienvenido a GoTraderz! Tu cuenta está confirmada"
+          duration={3000}
+          onDismiss={() => setShowWelcomeToast(false)}
+        />
+      )}
     </main>
   );
 }
