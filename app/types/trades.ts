@@ -78,6 +78,9 @@ export interface TradePost {
   trade_group_id: string;
   user_id: string;
   username: string | null;
+  // Igual que `username`: no viene del SELECT de user_trades, se completa aparte con
+  // app/lib/profiles.ts (fetchProfilesWithRank) tras agrupar las filas. Empieza null.
+  rank: string | null;
   quantity: number;
   notes: string | null;
   // Atributo del post completo (no por Pokémon) — se guarda duplicado en todas las

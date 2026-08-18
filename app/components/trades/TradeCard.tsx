@@ -7,6 +7,7 @@ import { Sparkles, User, ArrowLeftRight, Pencil, Trash2, Mountain, MapPin, HelpC
 import { supabase } from '@/app/lib/supabaseClient';
 import { timeAgo } from '@/app/lib/timeAgo';
 import { PokemonDetailPopover } from '@/app/components/trades/PokemonDetailPopover';
+import { RankBadge } from '@/app/components/trades/RankBadge';
 import type { TradePost, PokemonVariant } from '@/app/types/trades';
 
 interface TradeCardProps {
@@ -182,10 +183,11 @@ export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
         {trade.username ? (
           <Link
             href={`/usuario/${trade.user_id}`}
-            className="flex items-center gap-1.5 text-xs text-[#8792A0] transition hover:text-[#F4F6F8]"
+            className="flex min-w-0 items-center gap-1.5 text-xs text-[#8792A0] transition hover:text-[#F4F6F8]"
           >
-            <User className="h-3.5 w-3.5" />
-            {trade.username}
+            <User className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{trade.username}</span>
+            <RankBadge rank={trade.rank} />
           </Link>
         ) : (
           <div className="flex items-center gap-1.5 text-xs text-[#8792A0]">

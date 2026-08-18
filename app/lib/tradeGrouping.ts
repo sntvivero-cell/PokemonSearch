@@ -45,6 +45,7 @@ export function groupTradeRows(rows: RawTradeRow[]): TradePost[] {
         trade_group_id: row.trade_group_id,
         user_id: row.user_id,
         username: null,
+        rank: null,
         quantity: row.quantity,
         notes: row.notes,
         is_spoofer: row.is_spoofer,

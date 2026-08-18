@@ -10,6 +10,7 @@ import { TRADE_SELECT, groupTradeRows, type RawTradeRow } from '@/app/lib/tradeG
 import { getOrCreateConversation } from '@/app/lib/conversations';
 import type { TradePost } from '@/app/types/trades';
 import { TradeCard } from '@/app/components/trades/TradeCard';
+import { RankBadge } from '@/app/components/trades/RankBadge';
 
 interface UserProfilePageProps {
   params: Promise<{ userId: string }>;
@@ -26,6 +27,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
 
   const [username, setUsername] = useState<string | null>(null);
   const [friendCode, setFriendCode] = useState<string | null>(null);
+  const [rank, setRank] = useState<string | null>(null);
   const [trades, setTrades] = useState<TradePost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
       setLoadError(null);
 
       const [{ data: profile, error: profileError }, { data: tradeRows, error: tradesError }] = await Promise.all([
-        supabase.from('profiles').select('username, friend_code').eq('user_id', userId).maybeSingle(),
+        supabase.from('profiles_with_rank').select('username, friend_code, rank').eq('user_id', userId).maybeSingle(),
         supabase
           .from('user_trades')
           .select(TRADE_SELECT)
@@ -50,6 +52,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
       }
       setUsername(profile?.username ?? null);
       setFriendCode(profile?.friend_code ?? null);
+      setRank(profile?.rank ?? null);
 
       if (tradesError) {
         setLoadError(tradesError.message);
@@ -58,7 +61,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
       }
 
       const grouped = groupTradeRows((tradeRows as unknown as RawTradeRow[]) ?? []);
-      setTrades(grouped.map((t) => ({ ...t, username: profile?.username ?? null })));
+      setTrades(grouped.map((t) => ({ ...t, username: profile?.username ?? null, rank: profile?.rank ?? null })));
       setIsLoading(false);
     }
 
@@ -103,6 +106,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                 <h1 className="text-base font-extrabold tracking-tight">
                   {isLoading ? 'Cargando…' : (username ?? 'Entrenador')}
                 </h1>
+                {!isLoading && <RankBadge rank={rank} />}
                 {!isLoading && friendCode && (
                   <span className="rounded-full bg-[#232D38] px-2 py-0.5 text-[10px] font-semibold text-[#8792A0]">
                     {friendCode}

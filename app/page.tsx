@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
-import { fetchUsernames } from '@/app/lib/profiles';
+import { fetchProfilesWithRank } from '@/app/lib/profiles';
 import { fetchUnreadConversationCount } from '@/app/lib/conversations';
 import { TRADE_SELECT, groupTradeRows, type RawTradeRow } from '@/app/lib/tradeGrouping';
 import type { TradePost } from '@/app/types/trades';
@@ -66,8 +66,14 @@ export default function HomePage() {
       }
 
       const grouped = groupTradeRows((data as unknown as RawTradeRow[]) ?? []);
-      const usernames = await fetchUsernames(grouped.map((t) => t.user_id));
-      setTrades(grouped.map((t) => ({ ...t, username: usernames.get(t.user_id) ?? null })));
+      const profiles = await fetchProfilesWithRank(grouped.map((t) => t.user_id));
+      setTrades(
+        grouped.map((t) => ({
+          ...t,
+          username: profiles.get(t.user_id)?.username ?? null,
+          rank: profiles.get(t.user_id)?.rank ?? null,
+        }))
+      );
       setIsLoading(false);
     }
 
