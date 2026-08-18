@@ -30,8 +30,21 @@ body {
 
 /* Google Translate Website Translator: oculta la barra/iframe superior y el resaltado
    amarillo que agrega por defecto (no matchean el diseño oscuro de la app) — la única
-   interfaz visible es el botón custom de LanguageToggleButton.tsx. */
-.goog-te-banner-frame.skiptranslate {
+   interfaz visible es el botón custom de LanguageToggleButton.tsx.
+
+   `.goog-te-banner-frame` YA NO es la clase real que usa la versión actual del widget
+   (confirmado inspeccionando el DOM generado en este proyecto): el iframe de la barra
+   viene con una clase autogenerada tipo "VIpgJd-ZVi9od-ORHb-OEVmcd skiptranslate", que
+   cambia entre builds de Google. Lo único estable ahí es `skiptranslate`, la clase que
+   Google le pone a TODO lo que inyecta él mismo (para que su propio traductor no se
+   traduzca a sí mismo) — por eso el selector real es "cualquier iframe con esa clase",
+   no el nombre de clase viejo. Se deja `.goog-te-banner-frame.skiptranslate` también
+   por si una versión distinta del widget sí la usa, pero es la regla de abajo la que
+   realmente oculta la barra en este proyecto. Al ser display:none, el iframe deja de
+   ocupar espacio en el flujo normal del documento (no es position:fixed en esta
+   versión), así que esto también resuelve el contenido empujado hacia abajo. */
+.goog-te-banner-frame.skiptranslate,
+iframe.skiptranslate {
   display: none !important;
 }
 

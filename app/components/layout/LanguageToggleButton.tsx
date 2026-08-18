@@ -57,7 +57,14 @@ export function LanguageToggleButton() {
       onClick={toggleLanguage}
       aria-label={isEnglish ? 'Volver al español' : 'Translate to English'}
       title={isEnglish ? 'Volver al español' : 'Translate to English'}
-      className="flex h-8 items-center gap-1 rounded-full border border-[#232D38] px-2.5
+      // notranslate + translate="no": Google Translate traduce TODO nodo de texto de
+      // la página que no esté marcado así, incluida su propia etiqueta "ES"/"EN" — sin
+      // esto, tras traducir a inglés el botón para volver a español queda mostrando
+      // "IS" en vez de "ES" (confirmado inspeccionando el DOM). El toggle en sí sigue
+      // funcionando igual (depende de la cookie googtrans, no del texto visible), pero
+      // así el label no queda roto.
+      translate="no"
+      className="notranslate flex h-8 items-center gap-1 rounded-full border border-[#232D38] px-2.5
                  text-[11px] font-bold text-[#8792A0] transition hover:border-[#3A4C63]
                  hover:text-[#F4F6F8]"
     >
