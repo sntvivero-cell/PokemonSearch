@@ -22,6 +22,14 @@ alter table public.profiles add column is_developer boolean not null default fal
 -- v_is_new_post ANTES de pisar v_created_at con el fallback de `now()`, y se usa
 -- después del INSERT para incrementar el contador solo en ese caso. Reeditar un post
 -- existente (v_created_at no null) nunca lo toca.
+-- CHECKLIST — antes de dar por terminado cualquier rewrite futuro de esta función,
+-- confirmar que se preservan los 5 puntos de abajo (se perdió el cast a trade_intent
+-- dos veces por reescribir la función entera sin este chequeo explícito):
+--   1. Cast (r->>'intent')::trade_intent en el INSERT (columna tipada, no text).
+--   2. Chequeo de ownership contra trade_group_id de otro usuario.
+--   3. Preservación de created_at original al editar (min(created_at) del grupo).
+--   4. Cooldown vía profiles.last_trade_action_at (no max(updated_at) de user_trades).
+--   5. Incremento de total_trades_published solo cuando v_is_new_post (no en ediciones).
 create or replace function public.publish_trade_group(
   p_trade_group_id uuid,
   p_rows jsonb
@@ -80,7 +88,7 @@ begin
     v_user_id,
     p_trade_group_id,
     (r->>'variant_id')::uuid,
-    r->>'intent',
+    (r->>'intent')::trade_intent,
     (r->>'quantity')::int,
     r->>'notes',
     'active',

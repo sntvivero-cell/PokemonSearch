@@ -126,7 +126,7 @@ begin
     v_user_id,
     p_trade_group_id,
     (r->>'variant_id')::uuid,
-    r->>'intent',
+    (r->>'intent')::trade_intent,
     (r->>'quantity')::int,
     r->>'notes',
     'active',
