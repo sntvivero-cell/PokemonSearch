@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "./components/layout/Footer";
 import { CookieConsentBanner } from "./components/layout/CookieConsentBanner";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />
+        <Analytics />
       </body>
     </html>
   );
