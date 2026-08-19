@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Bookmark, LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
+import { Bookmark, LogIn, LogOut, Menu, MessageCircle, Plus, Search, Settings, X } from 'lucide-react';
 import { supabase, consumeAuthRedirectType } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { fetchProfilesWithRank } from '@/app/lib/profiles';
@@ -41,6 +41,18 @@ export default function HomePage() {
   const [unreadConversations, setUnreadConversations] = useState(0);
   const [showWelcomeToast, setShowWelcomeToast] = useState(false);
   const [savedTradeGroupIds, setSavedTradeGroupIds] = useState<Set<string>>(new Set());
+  // Menú "☰" que agrupa Mensajes/Guardados/Configuración/idioma en mobile (<md) — en
+  // desktop esos mismos links se muestran siempre en la fila, este estado no se usa.
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileMenuOpen]);
 
   // Detecta específicamente una confirmación de signup recién hecha (type=signup en el
   // hash del link del mail, capturado en supabaseClient.ts antes de que el SDK lo
@@ -136,93 +148,208 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#0B0F14] text-[#F4F6F8]">
       <header className="sticky top-0 z-10 border-b border-[#232D38] bg-[#0B0F14]/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-2.5">
-            <Image src="/logo-1024.png" alt="GoTraderz" width={36} height={36} className="rounded-lg" />
-            <div>
-              <h1 className="text-lg font-extrabold tracking-tight">GoTraderz</h1>
-              <p className="text-xs text-[#5C6773]">Tablón de intercambios de la comunidad</p>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <Image src="/logo-1024.png" alt="GoTraderz" width={36} height={36} className="shrink-0 rounded-lg" />
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-extrabold tracking-tight sm:text-lg">GoTraderz</h1>
+              {/* Oculto por completo debajo de md: es lo primero que sobra cuando no
+                 hay ancho para todo, y no aporta nada que el resto de la UI no diga
+                 ya (el feed de abajo deja clarísimo que esto es un tablón de trades). */}
+              <p className="hidden text-xs text-[#5C6773] md:block">Tablón de intercambios de la comunidad</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {!isUserLoading && (
-              <>
-                {user ? (
-                  <div className="flex items-center gap-2">
-                    <span className="hidden max-w-[160px] truncate text-xs text-[#8792A0] sm:inline">
-                      {user.email}
-                    </span>
-                    <button
-                      onClick={handleSignOut}
+
+          <div className="flex shrink-0 items-center gap-2">
+            {/* Desktop/tablet (md+): todo visible en una sola fila, igual que antes. */}
+            <div className="hidden items-center gap-2 md:flex">
+              {!isUserLoading && (
+                <>
+                  {user ? (
+                    <div className="flex items-center gap-2">
+                      <span className="max-w-[160px] truncate text-xs text-[#8792A0]">{user.email}</span>
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
+                                   text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
+                                   hover:text-[#F4F6F8]"
+                      >
+                        <LogOut className="h-3.5 w-3.5" />
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/login"
                       className="flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
                                  text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
                                  hover:text-[#F4F6F8]"
                     >
-                      <LogOut className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">Cerrar sesión</span>
-                    </button>
+                      <LogIn className="h-3.5 w-3.5" />
+                      Iniciar sesión
+                    </Link>
+                  )}
+                </>
+              )}
+              {user && (
+                <Link
+                  href="/mensajes"
+                  className="relative flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
+                             text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
+                             hover:text-[#F4F6F8]"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  Mensajes
+                  {unreadConversations > 0 && (
+                    <span
+                      className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center
+                                 rounded-full bg-[#FF3D3D] px-1 text-[9px] font-bold text-white"
+                    >
+                      {unreadConversations > 9 ? '9+' : unreadConversations}
+                    </span>
+                  )}
+                </Link>
+              )}
+              {user && (
+                <Link
+                  href="/guardados"
+                  className="flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
+                             text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
+                             hover:text-[#F4F6F8]"
+                >
+                  <Bookmark className="h-3.5 w-3.5" />
+                  Guardados
+                </Link>
+              )}
+              {user && (
+                <Link
+                  href="/configuracion"
+                  aria-label="Configuración"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[#232D38]
+                             text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                </Link>
+              )}
+              <LanguageToggleButton />
+            </div>
+
+            {/* Mobile (<md): todo lo de arriba colapsa acá, para no competir por
+               ancho con el logo/título y "Nuevo Trade", que tienen que quedar
+               siempre visibles. */}
+            <div className="relative md:hidden">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen((open) => !open)}
+                aria-label="Menú"
+                aria-expanded={isMobileMenuOpen}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border
+                           border-[#232D38] text-[#8792A0] transition hover:border-[#3A4C63]
+                           hover:text-[#F4F6F8]"
+              >
+                {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                {!isMobileMenuOpen && user && unreadConversations > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#FF3D3D] ring-2 ring-[#0B0F14]" />
+                )}
+              </button>
+
+              {isMobileMenuOpen && (
+                <>
+                  {/* Backdrop invisible: cerrar el menú al tocar afuera. */}
+                  <div className="fixed inset-0 z-10" onClick={() => setIsMobileMenuOpen(false)} />
+                  <div
+                    className="absolute right-0 top-11 z-20 flex w-56 flex-col gap-0.5 rounded-2xl border
+                               border-[#232D38] bg-[#131A22] p-2 shadow-xl"
+                  >
+                    {!isUserLoading && (
+                      <>
+                        {user ? (
+                          <button
+                            onClick={() => {
+                              handleSignOut();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-xs
+                                       font-semibold text-[#8792A0] transition hover:bg-[#0B0F14]
+                                       hover:text-[#F4F6F8]"
+                          >
+                            <LogOut className="h-4 w-4 shrink-0" />
+                            Cerrar sesión
+                          </button>
+                        ) : (
+                          <Link
+                            href="/login"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold
+                                       text-[#8792A0] transition hover:bg-[#0B0F14] hover:text-[#F4F6F8]"
+                          >
+                            <LogIn className="h-4 w-4 shrink-0" />
+                            Iniciar sesión
+                          </Link>
+                        )}
+                      </>
+                    )}
+                    {user && (
+                      <Link
+                        href="/mensajes"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center justify-between rounded-xl px-3 py-2.5 text-xs
+                                   font-semibold text-[#8792A0] transition hover:bg-[#0B0F14]
+                                   hover:text-[#F4F6F8]"
+                      >
+                        <span className="flex items-center gap-2">
+                          <MessageCircle className="h-4 w-4 shrink-0" />
+                          Mensajes
+                        </span>
+                        {unreadConversations > 0 && (
+                          <span
+                            className="flex h-4 min-w-[16px] items-center justify-center rounded-full
+                                       bg-[#FF3D3D] px-1 text-[9px] font-bold text-white"
+                          >
+                            {unreadConversations > 9 ? '9+' : unreadConversations}
+                          </span>
+                        )}
+                      </Link>
+                    )}
+                    {user && (
+                      <Link
+                        href="/guardados"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold
+                                   text-[#8792A0] transition hover:bg-[#0B0F14] hover:text-[#F4F6F8]"
+                      >
+                        <Bookmark className="h-4 w-4 shrink-0" />
+                        Guardados
+                      </Link>
+                    )}
+                    {user && (
+                      <Link
+                        href="/configuracion"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold
+                                   text-[#8792A0] transition hover:bg-[#0B0F14] hover:text-[#F4F6F8]"
+                      >
+                        <Settings className="h-4 w-4 shrink-0" />
+                        Configuración
+                      </Link>
+                    )}
+                    <div className="flex items-center justify-between rounded-xl px-3 py-1.5 text-xs font-semibold text-[#8792A0]">
+                      Idioma
+                      <LanguageToggleButton />
+                    </div>
                   </div>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
-                               text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
-                               hover:text-[#F4F6F8]"
-                  >
-                    <LogIn className="h-3.5 w-3.5" />
-                    Iniciar sesión
-                  </Link>
-                )}
-              </>
-            )}
-            {user && (
-              <Link
-                href="/mensajes"
-                className="relative flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
-                           text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
-                           hover:text-[#F4F6F8]"
-              >
-                <MessageCircle className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Mensajes</span>
-                {unreadConversations > 0 && (
-                  <span
-                    className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center
-                               rounded-full bg-[#FF3D3D] px-1 text-[9px] font-bold text-white"
-                  >
-                    {unreadConversations > 9 ? '9+' : unreadConversations}
-                  </span>
-                )}
-              </Link>
-            )}
-            {user && (
-              <Link
-                href="/guardados"
-                className="flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
-                           text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
-                           hover:text-[#F4F6F8]"
-              >
-                <Bookmark className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Guardados</span>
-              </Link>
-            )}
-            {user && (
-              <Link
-                href="/configuracion"
-                aria-label="Configuración"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#232D38]
-                           text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
-              >
-                <Settings className="h-3.5 w-3.5" />
-              </Link>
-            )}
-            <LanguageToggleButton />
+                </>
+              )}
+            </div>
+
             <Link
               href="/publicar"
-              className="flex items-center gap-1.5 rounded-full bg-[#2E9BF5] px-4 py-2 text-xs
-                         font-semibold text-white transition hover:bg-[#2589db]"
+              aria-label="Nuevo Trade"
+              className="flex items-center gap-1.5 rounded-full bg-[#2E9BF5] px-3 py-2 text-xs
+                         font-semibold text-white transition hover:bg-[#2589db] sm:px-4"
             >
               <Plus className="h-3.5 w-3.5" />
-              Nuevo Trade
+              <span className="hidden sm:inline">Nuevo Trade</span>
             </Link>
           </div>
         </div>
