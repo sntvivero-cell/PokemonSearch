@@ -13,6 +13,9 @@ export function Footer() {
         <Link href="/contacto" className="transition hover:text-[#F4F6F8]">
           Contacto
         </Link>
+        <Link href="/status" className="transition hover:text-[#F4F6F8]">
+          Estado del sitio
+        </Link>
       </nav>
       <p className="mx-auto max-w-2xl text-center text-[10px] leading-relaxed text-[#5C6773]">
         GoTraderz no está afiliado, respaldado ni asociado con Niantic, Inc., The Pokémon Company, Nintendo o Game

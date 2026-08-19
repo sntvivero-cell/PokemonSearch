@@ -24,12 +24,46 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [confirmEmailNotice, setConfirmEmailNotice] = useState(false);
   const [existingAccountNotice, setExistingAccountNotice] = useState(false);
+  // Username tomado por una cuenta que nunca confirmó el email (ver
+  // app/api/auth/check-username/route.ts) — antes esto cortaba en seco con "ya está
+  // en uso" sin salida. Ahora se ofrece reenviar el link de confirmación.
+  const [unconfirmedUsernameNotice, setUnconfirmedUsernameNotice] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendError, setResendError] = useState<string | null>(null);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function resetNotices() {
     setError(null);
     setConfirmEmailNotice(false);
     setExistingAccountNotice(false);
+    setUnconfirmedUsernameNotice(false);
+    setResendError(null);
+    setResendSuccess(false);
+  }
+
+  // Reenvía el link de confirmación al email que la persona ya tiene tipeado en el
+  // formulario — es el mismo email con el que originalmente se registró (por eso
+  // quedó bloqueada: mismo username, cuenta nunca confirmada). Si tipeó un email
+  // distinto al de aquella cuenta, Supabase devuelve error acá (no hay nada pendiente
+  // para ese email) y se lo mostramos tal cual.
+  async function handleResendConfirmation() {
+    setIsResending(true);
+    setResendError(null);
+    setResendSuccess(false);
+
+    const { error: resendErr } = await supabase.auth.resend({ type: 'signup', email });
+
+    setIsResending(false);
+    if (resendErr) {
+      setResendError(resendErr.message);
+      return;
+    }
+    setResendSuccess(true);
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    resetNotices();
 
     if (mode === 'login') {
       setIsSubmitting(true);
@@ -59,22 +93,37 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
 
-    // Chequeo previo contra profiles (SELECT es público) para dar un mensaje claro
-    // antes de intentar crear la cuenta. profiles.username tiene una unique
-    // constraint, así que si dos personas pasan este chequeo a la vez y chocan
+    // Chequeo previo (vía route handler con service_role, no un SELECT directo) para
+    // dar un mensaje claro antes de intentar crear la cuenta, distinguiendo si el
+    // username está tomado por una cuenta confirmada de verdad o por una que nunca
+    // confirmó el email (bug reportado: esas cuentas bloqueaban el username para
+    // siempre sin salida). Si dos personas pasan este chequeo a la vez y chocan
     // igual, el catch de abajo (mensaje genérico "Database error saving new user"
     // que Supabase devuelve cuando el trigger handle_new_user falla) es el respaldo.
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .eq('username', trimmedUsername)
-      .maybeSingle();
+    const checkResponse = await fetch('/api/auth/check-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: trimmedUsername }),
+    });
+    const checkResult: { status?: 'available' | 'taken' | 'unconfirmed'; error?: string } = await checkResponse
+      .json()
+      .catch(() => ({}));
 
-    if (existingProfile) {
+    if (checkResult.status === 'taken') {
       setError('Ese nombre de usuario ya está en uso.');
       setIsSubmitting(false);
       return;
     }
+
+    if (checkResult.status === 'unconfirmed') {
+      setUnconfirmedUsernameNotice(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // status === 'available', o la ruta falló (checkResult.error): no bloqueamos el
+    // signUp por un problema del chequeo previo — la unique constraint de `profiles`
+    // sigue siendo la red de seguridad real contra colisiones.
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -144,9 +193,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => {
                 setMode('login');
-                setError(null);
-                setConfirmEmailNotice(false);
-                setExistingAccountNotice(false);
+                resetNotices();
               }}
               className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                 mode === 'login' ? 'bg-[#2E9BF5] text-white' : 'text-[#8792A0] hover:text-[#F4F6F8]'
@@ -158,9 +205,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => {
                 setMode('signup');
-                setError(null);
-                setConfirmEmailNotice(false);
-                setExistingAccountNotice(false);
+                resetNotices();
               }}
               className={`flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                 mode === 'signup' ? 'bg-[#2E9BF5] text-white' : 'text-[#8792A0] hover:text-[#F4F6F8]'
@@ -245,6 +290,30 @@ export default function LoginPage() {
                   ¿Querés iniciar sesión?
                 </button>
               </p>
+            )}
+
+            {unconfirmedUsernameNotice && (
+              <div className="rounded-xl border border-[#FFCB05]/40 bg-[#FFCB05]/10 px-3 py-2.5 text-xs font-semibold text-[#FFCB05]">
+                <p>
+                  Ya intentaste registrarte con este nombre de usuario antes, pero nunca confirmaste el email.
+                  Si el email de arriba es el mismo que usaste esa vez, te podemos reenviar el link de confirmación.
+                </p>
+                {resendSuccess ? (
+                  <p className="mt-2 text-[#2E9BF5]">Listo, te reenviamos el link. Revisá tu email.</p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    disabled={isResending}
+                    className="mt-2 rounded-full border border-[#FFCB05]/50 px-3 py-1.5 text-[11px] font-bold
+                               text-[#FFCB05] transition hover:bg-[#FFCB05]/10 disabled:cursor-not-allowed
+                               disabled:opacity-50"
+                  >
+                    {isResending ? 'Reenviando…' : 'Reenviar link de confirmación'}
+                  </button>
+                )}
+                {resendError && <p className="mt-2 text-[#FF3D3D]">{resendError}</p>}
+              </div>
             )}
 
             <button
