@@ -4,7 +4,18 @@ import { useState, type MouseEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Sparkles, User, ArrowLeftRight, Pencil, Trash2, Mountain, MapPin, HelpCircle, MessageCircle } from 'lucide-react';
+import {
+  Sparkles,
+  User,
+  ArrowLeftRight,
+  Pencil,
+  Trash2,
+  Mountain,
+  MapPin,
+  HelpCircle,
+  MessageCircle,
+  Bookmark,
+} from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { timeAgo } from '@/app/lib/timeAgo';
 import { getOrCreateConversation } from '@/app/lib/conversations';
@@ -17,6 +28,14 @@ interface TradeCardProps {
   // Sin usuario logueado no se muestra "Editar"/"Eliminar", aunque el post sea propio.
   currentUserId?: string | null;
   onDeleted?: (tradeGroupId: string) => void;
+  // Estado inicial conocido por el padre (bulk fetch vía fetchSavedTradeGroupIds, ver
+  // app/lib/savedTrades.ts) — evita que cada card haga su propia consulta a
+  // saved_trades. Si se omite (ej. todavía no resolvió), arranca en "no guardado".
+  isSaved?: boolean;
+  // Avisa al padre cuando cambia el guardado, para que actualice su propio estado sin
+  // refetchear todo — clave en app/guardados/page.tsx, donde sacar un guardado debe
+  // sacar la card de la grilla al toque.
+  onSaveChange?: (tradeGroupId: string, isSaved: boolean) => void;
 }
 
 const BATTLE_LABEL: Record<string, string> = {
@@ -105,7 +124,7 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
   );
 }
 
-export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
+export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChange }: TradeCardProps) {
   const isOwner = currentUserId != null && trade.user_id === currentUserId;
   const router = useRouter();
 
@@ -113,6 +132,60 @@ export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
   const [conversationError, setConversationError] = useState<string | null>(null);
+  // `isSaved` llega del padre y puede resolverse recién después del primer render (el
+  // bulk fetch de saved_trades corre en un efecto aparte) — en vez de sincronizarlo a
+  // estado local con un useEffect (dispara un re-render extra en cascada), se guarda
+  // solo el override optimista que produce un click propio: mientras no hayas
+  // tocado el botón vos, `saved` sigue la prop en tiempo real; después de tocarlo, el
+  // override manda hasta que este componente se desmonte.
+  const [optimisticSaved, setOptimisticSaved] = useState<boolean | null>(null);
+  const saved = optimisticSaved ?? (isSaved ?? false);
+  const [isTogglingSave, setIsTogglingSave] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // stopPropagation: el botón vive adentro del <Link> al perfil (ver abajo), así que
+  // sin esto el click también dispararía la navegación al perfil.
+  async function handleToggleSave(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!currentUserId) {
+      router.push('/login');
+      return;
+    }
+
+    setSaveError(null);
+    setIsTogglingSave(true);
+
+    if (saved) {
+      const { error } = await supabase
+        .from('saved_trades')
+        .delete()
+        .eq('user_id', currentUserId)
+        .eq('trade_group_id', trade.trade_group_id);
+
+      setIsTogglingSave(false);
+      if (error) {
+        setSaveError('No se pudo quitar de guardados.');
+        return;
+      }
+      setOptimisticSaved(false);
+      onSaveChange?.(trade.trade_group_id, false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from('saved_trades')
+      .insert({ user_id: currentUserId, trade_group_id: trade.trade_group_id });
+
+    setIsTogglingSave(false);
+    if (error) {
+      setSaveError('No se pudo guardar.');
+      return;
+    }
+    setOptimisticSaved(true);
+    onSaveChange?.(trade.trade_group_id, true);
+  }
 
   // stopPropagation: el botón vive adentro del <Link> al perfil (ver abajo), así que
   // sin esto el click también dispararía la navegación al perfil.
@@ -238,7 +311,29 @@ export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
             Entrenador
           </div>
         )}
-        <span className="text-[10px] text-[#5C6773]">{timeAgo(trade.created_at)}</span>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Visible siempre que no sea tu propia publicación — a diferencia de
+             Editar/Eliminar (que solo aparecen si sos el dueño), guardar aplica
+             justo al revés: no tiene sentido guardar tu propio post. */}
+          {!isOwner && (
+            <button
+              type="button"
+              onClick={handleToggleSave}
+              disabled={isTogglingSave}
+              title={saved ? 'Quitar de guardados' : 'Guardar'}
+              aria-pressed={saved}
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition
+                          disabled:cursor-not-allowed disabled:opacity-50 ${
+                            saved
+                              ? 'border-[#FFCB05]/50 bg-[#FFCB05]/15 text-[#FFCB05]'
+                              : 'border-[#232D38] text-[#8792A0] hover:border-[#FFCB05] hover:text-[#FFCB05]'
+                          }`}
+            >
+              <Bookmark className="h-3 w-3" fill={saved ? 'currentColor' : 'none'} />
+            </button>
+          )}
+          <span className="text-[10px] text-[#5C6773]">{timeAgo(trade.created_at)}</span>
+        </div>
       </div>
 
       {isOwner && (
@@ -276,6 +371,12 @@ export function TradeCard({ trade, currentUserId, onDeleted }: TradeCardProps) {
       {conversationError && (
         <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
           {conversationError}
+        </p>
+      )}
+
+      {saveError && (
+        <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
+          {saveError}
         </p>
       )}
     </article>

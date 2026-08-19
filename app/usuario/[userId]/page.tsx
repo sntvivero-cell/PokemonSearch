@@ -7,6 +7,7 @@ import { ArrowLeft, MessageCircle, Settings, Sparkles, User } from 'lucide-react
 import { supabase } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { TRADE_SELECT, groupTradeRows, type RawTradeRow } from '@/app/lib/tradeGrouping';
+import { fetchSavedTradeGroupIds } from '@/app/lib/savedTrades';
 import { getOrCreateConversation } from '@/app/lib/conversations';
 import type { TradePost } from '@/app/types/trades';
 import { TradeCard } from '@/app/components/trades/TradeCard';
@@ -31,6 +32,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
   const [trades, setTrades] = useState<TradePost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [savedTradeGroupIds, setSavedTradeGroupIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function load() {
@@ -68,8 +70,28 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
     load();
   }, [userId]);
 
+  useEffect(() => {
+    async function loadSaved() {
+      if (!currentUser) {
+        setSavedTradeGroupIds(new Set());
+        return;
+      }
+      setSavedTradeGroupIds(await fetchSavedTradeGroupIds(currentUser.id));
+    }
+    loadSaved();
+  }, [currentUser]);
+
   function handleDeleted(tradeGroupId: string) {
     setTrades((prev) => prev.filter((t) => t.trade_group_id !== tradeGroupId));
+  }
+
+  function handleSaveChange(tradeGroupId: string, isSaved: boolean) {
+    setSavedTradeGroupIds((prev) => {
+      const next = new Set(prev);
+      if (isSaved) next.add(tradeGroupId);
+      else next.delete(tradeGroupId);
+      return next;
+    });
   }
 
   async function handleSendMessage() {
@@ -178,6 +200,8 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                 trade={trade}
                 currentUserId={currentUser?.id ?? null}
                 onDeleted={handleDeleted}
+                isSaved={savedTradeGroupIds.has(trade.trade_group_id)}
+                onSaveChange={handleSaveChange}
               />
             ))}
           </div>

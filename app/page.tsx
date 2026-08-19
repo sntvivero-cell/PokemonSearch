@@ -4,10 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
+import { Bookmark, LogIn, LogOut, MessageCircle, Plus, Search, Settings } from 'lucide-react';
 import { supabase, consumeAuthRedirectType } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { fetchProfilesWithRank } from '@/app/lib/profiles';
+import { fetchSavedTradeGroupIds } from '@/app/lib/savedTrades';
 import { fetchUnreadConversationCount } from '@/app/lib/conversations';
 import { TRADE_SELECT, groupTradeRows, type RawTradeRow } from '@/app/lib/tradeGrouping';
 import type { TradePost } from '@/app/types/trades';
@@ -39,6 +40,7 @@ export default function HomePage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [unreadConversations, setUnreadConversations] = useState(0);
   const [showWelcomeToast, setShowWelcomeToast] = useState(false);
+  const [savedTradeGroupIds, setSavedTradeGroupIds] = useState<Set<string>>(new Set());
 
   // Detecta específicamente una confirmación de signup recién hecha (type=signup en el
   // hash del link del mail, capturado en supabaseClient.ts antes de que el SDK lo
@@ -61,6 +63,26 @@ export default function HomePage() {
     }
     loadUnreadCount();
   }, [user]);
+
+  useEffect(() => {
+    async function loadSaved() {
+      if (!user) {
+        setSavedTradeGroupIds(new Set());
+        return;
+      }
+      setSavedTradeGroupIds(await fetchSavedTradeGroupIds(user.id));
+    }
+    loadSaved();
+  }, [user]);
+
+  function handleSaveChange(tradeGroupId: string, isSaved: boolean) {
+    setSavedTradeGroupIds((prev) => {
+      const next = new Set(prev);
+      if (isSaved) next.add(tradeGroupId);
+      else next.delete(tradeGroupId);
+      return next;
+    });
+  }
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -174,6 +196,17 @@ export default function HomePage() {
             )}
             {user && (
               <Link
+                href="/guardados"
+                className="flex items-center gap-1.5 rounded-full border border-[#232D38] px-3 py-2
+                           text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
+                           hover:text-[#F4F6F8]"
+              >
+                <Bookmark className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Guardados</span>
+              </Link>
+            )}
+            {user && (
+              <Link
                 href="/configuracion"
                 aria-label="Configuración"
                 className="flex h-8 w-8 items-center justify-center rounded-full border border-[#232D38]
@@ -230,6 +263,8 @@ export default function HomePage() {
                 trade={trade}
                 currentUserId={user?.id ?? null}
                 onDeleted={handleDeleted}
+                isSaved={savedTradeGroupIds.has(trade.trade_group_id)}
+                onSaveChange={handleSaveChange}
               />
             ))}
           </div>
