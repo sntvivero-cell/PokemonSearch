@@ -130,7 +130,7 @@ export function PokemonDetailPopover({ variant, children, className }: PokemonDe
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            aria-label="Cerrar detalle"
+            aria-label="Close details"
             className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full
                        text-[#5C6773] transition hover:bg-[#232D38] hover:text-[#F4F6F8]"
           >

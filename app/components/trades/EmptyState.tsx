@@ -9,16 +9,16 @@ export function EmptyState() {
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2E9BF5]/10">
         <Sparkles className="h-5 w-5 text-[#2E9BF5]" />
       </div>
-      <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">Todavía no hay intercambios</p>
+      <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">No trades yet</p>
       <p className="mt-1 max-w-xs text-xs text-[#5C6773]">
-        Sé el primer entrenador de la comunidad en publicar un Pokémon que ofreces o que buscas.
+        Be the first trainer in the community to post a Pokémon you&apos;re offering or looking for.
       </p>
       <Link
         href="/publicar"
         className="mt-5 rounded-full bg-[#2E9BF5] px-5 py-2 text-xs font-semibold text-white
                    transition hover:bg-[#2589db]"
       >
-        Publicar el primer trade
+        Post the first trade
       </Link>
     </div>
   );

@@ -27,14 +27,14 @@ const CATEGORY_ORDER = [
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
-  team: 'Equipo',
-  seasonal: 'Temporada / Evento',
-  location: 'Ubicación',
-  stadium: 'Estadio',
+  team: 'Team',
+  seasonal: 'Season / Event',
+  location: 'Location',
+  stadium: 'Stadium',
   national_trust: 'National Trust',
   pokelids: 'PokéLids',
-  pokemon_center: 'Centro Pokémon',
-  other: 'Otros',
+  pokemon_center: 'Pokémon Center',
+  other: 'Other',
 };
 
 interface VariantConfiguratorProps {
@@ -111,7 +111,7 @@ export function VariantConfigurator({
           onClick={onClear}
           className="shrink-0 text-xs font-semibold text-[#5C6773] transition hover:text-[#F4F6F8]"
         >
-          Cambiar
+          Change
         </button>
       </div>
 
@@ -129,13 +129,13 @@ export function VariantConfigurator({
             <Sparkles className="h-3.5 w-3.5" />
             Shiny
           </span>
-          <span>{isShiny ? 'Activado' : 'Desactivado'}</span>
+          <span>{isShiny ? 'On' : 'Off'}</span>
         </button>
       </div>
 
       <div className="mt-3">
         <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#5C6773]">
-          Estado de combate
+          Battle state
         </p>
         <div className="flex flex-wrap gap-1.5">
           {BATTLE_STATES.map((state) => {
@@ -160,14 +160,14 @@ export function VariantConfigurator({
 
       {backgrounds.length > 0 && (
         <div className="mt-3">
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#5C6773]">Fondo</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#5C6773]">Background</p>
           <button
             type="button"
             onClick={() => setIsBackgroundOpen((v) => !v)}
             className="flex w-full items-center justify-between rounded-lg border border-[#232D38] px-3 py-2
                        text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]"
           >
-            <span className="truncate">{background?.name ?? 'Sin fondo'}</span>
+            <span className="truncate">{background?.name ?? 'No background'}</span>
             <ChevronDown
               className={`h-3.5 w-3.5 shrink-0 transition-transform ${isBackgroundOpen ? 'rotate-180' : ''}`}
             />
@@ -184,7 +184,7 @@ export function VariantConfigurator({
                     : 'border border-[#232D38] text-[#8792A0] hover:border-[#3A4C63]'
                 }`}
               >
-                Sin fondo
+                No background
               </button>
 
               {groupedBackgrounds.map(({ category, items }) => (

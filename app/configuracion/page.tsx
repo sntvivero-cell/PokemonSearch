@@ -79,17 +79,17 @@ export default function ConfiguracionPage() {
 
     const trimmedUsername = username.trim();
     if (trimmedUsername.length < USERNAME_MIN_LENGTH || trimmedUsername.length > USERNAME_MAX_LENGTH) {
-      setError(`El nombre de usuario debe tener entre ${USERNAME_MIN_LENGTH} y ${USERNAME_MAX_LENGTH} caracteres.`);
+      setError(`Username must be between ${USERNAME_MIN_LENGTH} and ${USERNAME_MAX_LENGTH} characters.`);
       return;
     }
     if (/\s/.test(trimmedUsername)) {
-      setError('El nombre de usuario no puede tener espacios.');
+      setError('Username cannot contain spaces.');
       return;
     }
 
     const trimmedFriendCode = friendCode.trim();
     if (trimmedFriendCode && !isValidFriendCode(trimmedFriendCode)) {
-      setError('El código de amigo debe tener 12 dígitos (podés separarlos con espacios).');
+      setError('Friend code must have 12 digits (you can separate them with spaces).');
       return;
     }
 
@@ -103,9 +103,9 @@ export default function ConfiguracionPage() {
     if (updateError) {
       // profiles.username tiene una unique constraint.
       if (updateError.code === '23505') {
-        setError('Ese nombre de usuario ya está en uso.');
+        setError('That username is already taken.');
       } else {
-        setError(`No se pudo guardar: ${updateError.message}`);
+        setError(`Could not save: ${updateError.message}`);
       }
       return;
     }
@@ -122,11 +122,11 @@ export default function ConfiguracionPage() {
     setPasswordSaved(false);
 
     if (newPassword.length < PASSWORD_MIN_LENGTH) {
-      setPasswordError(`La contraseña debe tener al menos ${PASSWORD_MIN_LENGTH} caracteres.`);
+      setPasswordError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError('Las contraseñas no coinciden.');
+      setPasswordError('Passwords do not match.');
       return;
     }
 
@@ -147,7 +147,7 @@ export default function ConfiguracionPage() {
   if (isUserLoading || isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-[#F4F6F8]">
-        <p className="text-xs text-[#5C6773]">Cargando…</p>
+        <p className="text-xs text-[#5C6773]">Loading…</p>
       </main>
     );
   }
@@ -160,7 +160,7 @@ export default function ConfiguracionPage() {
           className="mb-6 flex items-center gap-1.5 text-xs font-semibold text-[#8792A0] transition hover:text-[#F4F6F8]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al feed
+          Back to feed
         </Link>
 
         <div className="rounded-2xl border border-[#232D38] bg-[#131A22] p-6">
@@ -168,13 +168,13 @@ export default function ConfiguracionPage() {
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2E9BF5]/10">
               <Settings className="h-5 w-5 text-[#2E9BF5]" />
             </div>
-            <h1 className="mt-3 text-base font-extrabold tracking-tight">Configuración</h1>
-            <p className="mt-1 text-xs text-[#5C6773]">Editá tu perfil de entrenador</p>
+            <h1 className="mt-3 text-base font-extrabold tracking-tight">Settings</h1>
+            <p className="mt-1 text-xs text-[#5C6773]">Edit your trainer profile</p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Nombre de usuario</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Username</label>
               <input
                 type="text"
                 required
@@ -189,7 +189,7 @@ export default function ConfiguracionPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Código de amigo</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Friend code</label>
               <input
                 type="text"
                 value={friendCode}
@@ -200,7 +200,7 @@ export default function ConfiguracionPage() {
                            focus:border-[#2E9BF5]"
               />
               <p className="mt-1.5 text-[10px] text-[#5C6773]">
-                Así otros pueden agregarte como amigo en Pokémon GO. Es opcional.
+                So others can add you as a friend in Pokémon GO. Optional.
               </p>
             </div>
 
@@ -212,7 +212,7 @@ export default function ConfiguracionPage() {
 
             {saved && !error && (
               <p className="rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
-                Cambios guardados.
+                Changes saved.
               </p>
             )}
 
@@ -222,17 +222,17 @@ export default function ConfiguracionPage() {
               className="mt-2 rounded-full bg-[#2E9BF5] px-5 py-2.5 text-xs font-semibold text-white
                          transition hover:bg-[#2589db] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSaving ? 'Guardando…' : 'Guardar'}
+              {isSaving ? 'Saving…' : 'Save'}
             </button>
           </form>
         </div>
 
         <div className="mt-4 rounded-2xl border border-[#232D38] bg-[#131A22] p-6">
-          <h2 className="mb-4 text-sm font-extrabold tracking-tight">Cambiar contraseña</h2>
+          <h2 className="mb-4 text-sm font-extrabold tracking-tight">Change password</h2>
 
           <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-3">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Nueva contraseña</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">New password</label>
               <input
                 type="password"
                 required
@@ -247,7 +247,7 @@ export default function ConfiguracionPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Confirmar nueva contraseña</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Confirm new password</label>
               <input
                 type="password"
                 required
@@ -269,7 +269,7 @@ export default function ConfiguracionPage() {
 
             {passwordSaved && !passwordError && (
               <p className="rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
-                Contraseña actualizada.
+                Password updated.
               </p>
             )}
 
@@ -279,7 +279,7 @@ export default function ConfiguracionPage() {
               className="mt-2 rounded-full bg-[#2E9BF5] px-5 py-2.5 text-xs font-semibold text-white
                          transition hover:bg-[#2589db] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSavingPassword ? 'Guardando…' : 'Cambiar contraseña'}
+              {isSavingPassword ? 'Saving…' : 'Change password'}
             </button>
           </form>
         </div>

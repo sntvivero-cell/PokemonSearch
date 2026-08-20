@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Política de Privacidad — GoTraderz',
+  title: 'Privacy Policy — GoTraderz',
 };
 
 export default function PrivacyPolicyPage() {
@@ -17,97 +17,95 @@ export default function PrivacyPolicyPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="text-base font-extrabold tracking-tight">Política de Privacidad</h1>
+          <h1 className="text-base font-extrabold tracking-tight">Privacy Policy</h1>
         </div>
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-8 text-sm leading-relaxed text-[#8792A0]">
-        <p className="mb-6 text-xs text-[#5C6773]">Última actualización: agosto de 2026.</p>
+        <p className="mb-6 text-xs text-[#5C6773]">Last updated: August 2026.</p>
 
         <p className="mb-4">
-          Esta política explica qué datos personales recoge <strong className="text-[#F4F6F8]">GoTraderz</strong>{' '}
-          (en adelante, &ldquo;la app&rdquo;, &ldquo;el sitio&rdquo; o &ldquo;nosotros&rdquo;), para qué los usa y qué derechos tenés sobre ellos bajo
-          el Reglamento General de Protección de Datos (RGPD) de la Unión Europea, en caso de que residas en la UE,
-          o bajo la normativa de protección de datos que corresponda a tu país.
+          This policy explains what personal data <strong className="text-[#F4F6F8]">GoTraderz</strong>{' '}
+          (hereinafter, &ldquo;the app&rdquo;, &ldquo;the site&rdquo;, or &ldquo;we&rdquo;) collects, what we use it for, and what rights you have
+          over it under the European Union&apos;s General Data Protection Regulation (GDPR), if you reside in the EU,
+          or under the data protection regulations applicable to your country.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">1. Responsable del tratamiento</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">1. Data controller</h2>
         <p className="mb-4">
-          GoTraderz es un proyecto independiente de fans, gestionado por su propio equipo. Para cualquier
-          consulta sobre esta política o tus datos personales, podés escribir a{' '}
+          GoTraderz is an independent fan project, run by its own team. For any questions about this
+          policy or your personal data, you can write to{' '}
           <a href="mailto:contact@gotraderz.com" className="text-[#2E9BF5] hover:underline">
             contact@gotraderz.com
           </a>.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">2. Qué datos recogemos</h2>
-        <p className="mb-2">Para poder usar GoTraderz recogemos:</p>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">2. What data we collect</h2>
+        <p className="mb-2">To use GoTraderz, we collect:</p>
         <ul className="mb-4 ml-4 list-disc space-y-1">
-          <li>Tu dirección de email, al crear una cuenta.</li>
-          <li>El nombre de usuario que elegís al registrarte.</li>
-          <li>Tu código de amigo de Pokémon GO, únicamente si decidís cargarlo (es un campo opcional).</li>
-          <li>El contenido de las publicaciones de intercambio que creás (Pokémon ofrecidos/buscados, notas, etc.).</li>
-          <li>El contenido de los mensajes que enviás por el chat interno a otros usuarios.</li>
+          <li>Your email address, when you create an account.</li>
+          <li>The username you choose when signing up.</li>
+          <li>Your Pokémon GO friend code, only if you choose to add it (it&apos;s an optional field).</li>
+          <li>The content of the trade posts you create (Pokémon offered/wanted, notes, etc.).</li>
+          <li>The content of the messages you send other users through the internal chat.</li>
         </ul>
         <p className="mb-4">
-          No recogemos datos de pago (GoTraderz no procesa pagos) ni datos de ubicación precisa más allá de lo que
-          vos mismo escribas en tus publicaciones o mensajes.
+          We do not collect payment data (GoTraderz does not process payments) or precise location data beyond
+          what you write yourself in your posts or messages.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">3. Dónde se almacenan los datos</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">3. Where data is stored</h2>
         <p className="mb-4">
-          Los datos se almacenan en la infraestructura de <strong className="text-[#F4F6F8]">Supabase</strong>,
-          nuestro proveedor de base de datos y autenticación (Supabase, Inc.). Supabase corre sobre infraestructura
-          de AWS y permite elegir, al crear un proyecto, la región de AWS donde se aloja: puede ser una región
-          dentro de la Unión Europea (por ejemplo Frankfurt o Irlanda) o fuera de ella, según cómo se haya
-          configurado este proyecto en particular.
+          Data is stored on <strong className="text-[#F4F6F8]">Supabase</strong>&apos;s infrastructure,
+          our database and authentication provider (Supabase, Inc.). Supabase runs on AWS infrastructure
+          and lets you choose, when creating a project, the AWS region where it&apos;s hosted: it can be a region
+          within the European Union (e.g. Frankfurt or Ireland) or outside it, depending on how this particular
+          project has been configured.
         </p>
         <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">4. Cookies</h2>
         <p className="mb-4">
-          Usamos únicamente cookies y almacenamiento local técnicos, estrictamente necesarios para el
-          funcionamiento del sitio: mantener tu sesión iniciada a través de Supabase Auth, y recordar tu elección
-          sobre el aviso de cookies. No usamos cookies de analítica, seguimiento ni publicidad. Si en el futuro
-          incorporamos alguna, actualizaremos esta política y pediremos tu consentimiento explícito antes de
-          activarlas.
+          We only use technical cookies and local storage, strictly necessary for the site to function:
+          keeping you signed in via Supabase Auth, and remembering your choice on the cookie notice. We don&apos;t
+          use analytics, tracking, or advertising cookies. If we add any in the future, we&apos;ll update this
+          policy and ask for your explicit consent before enabling them.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">5. Para qué usamos tus datos</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">5. What we use your data for</h2>
         <p className="mb-4">
-          Usamos tus datos exclusivamente para operar el servicio: mostrar tus publicaciones y tu nombre de usuario
-          a otros usuarios de la comunidad, permitir que te contacten por chat, y mantener tu sesión iniciada.{' '}
+          We use your data exclusively to operate the service: showing your posts and username to other
+          community members, letting them contact you via chat, and keeping you signed in.{' '}
           <strong className="text-[#F4F6F8]">
-            No vendemos ni compartimos tus datos con terceros, y no los usamos con fines publicitarios.
+            We do not sell or share your data with third parties, and we do not use it for advertising purposes.
           </strong>
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">6. Tus derechos</h2>
-        <p className="mb-2">Si tus datos están protegidos por el RGPD (u otra normativa equivalente), tenés derecho a:</p>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">6. Your rights</h2>
+        <p className="mb-2">If your data is protected by the GDPR (or an equivalent regulation), you have the right to:</p>
         <ul className="mb-4 ml-4 list-disc space-y-1">
-          <li><strong className="text-[#F4F6F8]">Acceso</strong>: saber qué datos tuyos tenemos.</li>
-          <li><strong className="text-[#F4F6F8]">Rectificación</strong>: corregir datos incorrectos (podés editar tu username y código de amigo vos mismo desde Configuración).</li>
-          <li><strong className="text-[#F4F6F8]">Supresión</strong> (&ldquo;derecho al olvido&rdquo;): pedir que borremos tu cuenta y tus datos.</li>
-          <li><strong className="text-[#F4F6F8]">Oposición y limitación</strong> del tratamiento de tus datos.</li>
-          <li><strong className="text-[#F4F6F8]">Portabilidad</strong>: pedir una copia de tus datos en un formato reutilizable.</li>
+          <li><strong className="text-[#F4F6F8]">Access</strong>: know what data of yours we have.</li>
+          <li><strong className="text-[#F4F6F8]">Rectification</strong>: correct inaccurate data (you can edit your username and friend code yourself from Settings).</li>
+          <li><strong className="text-[#F4F6F8]">Erasure</strong> (&ldquo;right to be forgotten&rdquo;): ask us to delete your account and your data.</li>
+          <li><strong className="text-[#F4F6F8]">Objection and restriction</strong> of the processing of your data.</li>
+          <li><strong className="text-[#F4F6F8]">Portability</strong>: request a copy of your data in a reusable format.</li>
         </ul>
         <p className="mb-4">
-          Para ejercer cualquiera de estos derechos, incluyendo el borrado completo de tu cuenta, escribinos a{' '}
+          To exercise any of these rights, including full deletion of your account, write to us at{' '}
           <a href="mailto:contact@gotraderz.com" className="text-[#2E9BF5] hover:underline">
             contact@gotraderz.com
           </a>{' '}
-          indicando tu nombre de usuario o email registrado.
+          stating your username or registered email.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. Cuánto tiempo conservamos tus datos</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. How long we keep your data</h2>
         <p className="mb-4">
-          Conservamos tus datos mientras tu cuenta esté activa. Si pedís la baja de tu cuenta, eliminamos tus datos
-          personales y publicaciones asociadas, salvo que la ley nos obligue a conservar algún registro por más
-          tiempo.
+          We keep your data while your account is active. If you request account deletion, we remove your
+          personal data and associated posts, unless the law requires us to keep some record for longer.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">8. Cambios a esta política</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">8. Changes to this policy</h2>
         <p className="mb-4">
-          Podemos actualizar esta política ocasionalmente. Si hacemos cambios importantes, lo indicaremos
-          actualizando la fecha al inicio de esta página.
+          We may update this policy occasionally. If we make significant changes, we&apos;ll indicate this by
+          updating the date at the top of this page.
         </p>
       </div>
     </main>

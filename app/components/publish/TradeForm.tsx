@@ -11,9 +11,9 @@ import type { BackgroundOption, TrinketChoice } from '@/app/types/trades';
 import { TradeSideList, configuredSlots, createInitialSlots, type TradeSideSlot } from './TradeSideList';
 
 const TRINKET_OPTIONS: { value: TrinketChoice; label: string }[] = [
-  { value: 'none', label: 'Sin trinket' },
-  { value: 'self', label: 'Mi trinket' },
-  { value: 'other', label: 'Tu trinket' },
+  { value: 'none', label: 'No trinket' },
+  { value: 'self', label: 'My trinket' },
+  { value: 'other', label: 'Your trinket' },
 ];
 
 export interface TradeFormValues {
@@ -140,7 +140,7 @@ export function TradeForm({
 
     if (configuredSlots(seekingSlots).length > 0) {
       const confirmed = window.confirm(
-        'Esto va a quitar los Pokémon que elegiste en "Busco a cambio", ¿continuar?'
+        'This will remove the Pokémon you selected in "Looking for", continue?'
       );
       if (!confirmed) return;
       setSeekingSlots(createInitialSlots());
@@ -153,21 +153,21 @@ export function TradeForm({
     setSubmitError(null);
 
     if (!isLoggedIn) {
-      setSubmitError('Necesitás iniciar sesión.');
+      setSubmitError('You need to sign in.');
       return;
     }
     if (!hasAnyPokemon) {
-      setSubmitError('Agregá al menos un Pokémon en "Ofrezco" o en "Busco a cambio".');
+      setSubmitError('Add at least one Pokémon to "Offering" or "Looking for".');
       return;
     }
     if (!openToOffers && configuredSlots(seekingSlots).length === 0) {
       setSubmitError(
-        'Agregá al menos un Pokémon en "Busco a cambio" o activá "No busco nada específico (Busco ofertas)".'
+        'Add at least one Pokémon to "Looking for" or enable "Not looking for anything specific (Looking for offers)".'
       );
       return;
     }
     if (isInCooldown) {
-      setSubmitError(`Podés ${cooldownActionVerb} de nuevo en ${formatDuration(cooldownRemainingMs)}.`);
+      setSubmitError(`You can ${cooldownActionVerb} again in ${formatDuration(cooldownRemainingMs)}.`);
       return;
     }
 
@@ -189,18 +189,18 @@ export function TradeForm({
     <form onSubmit={handleSubmit} className="mx-auto max-w-3xl px-4 py-6">
       {isUserReady && !isLoggedIn && (
         <p className="mb-4 rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
-          Necesitás iniciar sesión.{' '}
+          You need to sign in.{' '}
           <Link href="/login" className="underline underline-offset-2 hover:text-[#F4F6F8]">
-            Iniciar sesión
+            Sign in
           </Link>
         </p>
       )}
 
       <section className="rounded-2xl border border-[#232D38] bg-[#131A22] p-4">
         <h2 className="mb-1 text-xs font-bold uppercase tracking-wide text-[#8792A0]">
-          1. Pokémon del intercambio
+          1. Trade Pokémon
         </h2>
-        <p className="mb-3 text-[11px] text-[#5C6773]">Podés agregar hasta 10 Pokémon distintos por lado.</p>
+        <p className="mb-3 text-[11px] text-[#5C6773]">You can add up to 10 different Pokémon per side.</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <TradeSideList side="offer" slots={offeringSlots} onChange={setOfferingSlots} backgrounds={backgrounds} />
           <div className="flex flex-1 flex-col">
@@ -216,9 +216,9 @@ export function TradeForm({
             >
               <span className="flex items-center gap-1.5">
                 <HelpCircle className="h-3.5 w-3.5" />
-                No busco nada específico (Busco ofertas)
+                Not looking for anything specific (Looking for offers)
               </span>
-              <span>{openToOffers ? 'Activado' : 'Desactivado'}</span>
+              <span>{openToOffers ? 'On' : 'Off'}</span>
             </button>
             <TradeSideList
               side="seek"
@@ -232,9 +232,9 @@ export function TradeForm({
       </section>
 
       <section className="mt-4 rounded-2xl border border-[#232D38] bg-[#131A22] p-4">
-        <h2 className="mb-3 text-xs font-bold uppercase tracking-wide text-[#8792A0]">2. Detalles</h2>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-wide text-[#8792A0]">2. Details</h2>
 
-        <label className="block text-xs font-semibold text-[#8792A0]">Cantidad</label>
+        <label className="block text-xs font-semibold text-[#8792A0]">Quantity</label>
         <input
           type="number"
           min={1}
@@ -257,12 +257,12 @@ export function TradeForm({
           >
             <span className="flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" />
-              Hago spoofing (Fly)
+              I spoof (Fly)
             </span>
-            <span>{isSpoofer ? 'Activado' : 'Desactivado'}</span>
+            <span>{isSpoofer ? 'On' : 'Off'}</span>
           </button>
           <p className="mt-1.5 text-[11px] text-[#5C6773]">
-            Marca esto si usás apps de ubicación falsa para jugar.
+            Check this if you use fake location apps to play.
           </p>
         </div>
 
@@ -295,18 +295,18 @@ export function TradeForm({
             })}
           </div>
           <p className="mt-1.5 text-[11px] text-[#5C6773]">
-            El trinket garantiza que el intercambio sea con suerte.
+            The trinket guarantees the trade will be a Lucky Trade.
           </p>
         </div>
 
         <label className="mt-4 block text-xs font-semibold text-[#8792A0]">
-          Notas <span className="text-[#5C6773]">(opcional)</span>
+          Notes <span className="text-[#5C6773]">(optional)</span>
         </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
-          placeholder="Ej. acepto legendarios a cambio"
+          placeholder="E.g. I accept legendaries in return"
           className="mt-1.5 w-full resize-none rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2
                      text-sm text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
                      focus:border-[#2E9BF5]"
@@ -315,8 +315,8 @@ export function TradeForm({
 
       {isInCooldown && (
         <p className="mt-4 rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
-          Podés {cooldownActionVerb} de nuevo en {formatDuration(cooldownRemainingMs)} — solo se puede publicar o
-          editar un post cada 30 minutos.
+          You can {cooldownActionVerb} again in {formatDuration(cooldownRemainingMs)} — you can only post or edit
+          once every 30 minutes.
         </p>
       )}
 
@@ -335,7 +335,7 @@ export function TradeForm({
           className="flex-1 rounded-full border border-[#232D38] px-5 py-2.5 text-center text-xs
                      font-semibold text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
         >
-          Cancelar
+          Cancel
         </Link>
         <button
           type="submit"
@@ -346,7 +346,7 @@ export function TradeForm({
           {isSubmitting
             ? submittingLabel
             : isInCooldown
-              ? `Disponible en ${formatDuration(cooldownRemainingMs)}`
+              ? `Available in ${formatDuration(cooldownRemainingMs)}`
               : submitLabel}
         </button>
       </div>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Términos de Uso — GoTraderz',
+  title: 'Terms of Use — GoTraderz',
 };
 
 export default function TermsOfUsePage() {
@@ -17,66 +17,65 @@ export default function TermsOfUsePage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="text-base font-extrabold tracking-tight">Términos de Uso</h1>
+          <h1 className="text-base font-extrabold tracking-tight">Terms of Use</h1>
         </div>
       </header>
 
       <div className="mx-auto max-w-2xl px-4 py-8 text-sm leading-relaxed text-[#8792A0]">
-        <p className="mb-6 text-xs text-[#5C6773]">Última actualización: agosto de 2026.</p>
+        <p className="mb-6 text-xs text-[#5C6773]">Last updated: August 2026.</p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">1. Qué es GoTraderz</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">1. What GoTraderz is</h2>
         <p className="mb-4">
-          GoTraderz es una herramienta hecha por fans para que jugadores de Pokémon GO puedan publicar qué Pokémon
-          ofrecen y qué buscan a cambio, y coordinar intercambios entre ellos por chat. Es un proyecto independiente,
-          no está afiliado con Niantic, Inc., The Pokémon Company, Nintendo ni Game Freak.
+          GoTraderz is a fan-made tool for Pokémon GO players to post which Pokémon they&apos;re offering
+          and which they&apos;re looking for in return, and to coordinate trades with each other via chat. It is an
+          independent project, not affiliated with Niantic, Inc., The Pokémon Company, Nintendo, or Game Freak.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">2. Sin garantía de que los intercambios se concreten</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">2. No guarantee that trades will happen</h2>
         <p className="mb-4">
-          GoTraderz es solo un tablón de anuncios y un canal de contacto entre usuarios. No garantizamos que un
-          intercambio publicado vaya a concretarse, ni verificamos la identidad, ubicación real o buena fe de otros
-          usuarios. Coordinar y realizar el intercambio dentro de Pokémon GO es responsabilidad exclusiva de las
-          personas involucradas.
+          GoTraderz is only a listing board and a contact channel between users. We do not guarantee that a
+          posted trade will actually happen, nor do we verify the identity, real location, or good faith of
+          other users. Coordinating and carrying out the trade within Pokémon GO is the sole responsibility of
+          the people involved.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">3. Responsabilidad sobre el contenido publicado</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">3. Responsibility for posted content</h2>
         <p className="mb-4">
-          Cada usuario es el único responsable del contenido que publica: sus publicaciones de intercambio, notas,
-          nombre de usuario, código de amigo (si lo carga) y mensajes de chat. GoTraderz no revisa previamente ese
-          contenido antes de que se publique.
+          Each user is solely responsible for the content they post: their trade posts, notes, username, friend
+          code (if added), and chat messages. GoTraderz does not review that content before it is published.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">4. Qué no está permitido</h2>
-        <p className="mb-2">No está permitido usar GoTraderz para publicar o enviar:</p>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">4. What is not allowed</h2>
+        <p className="mb-2">You may not use GoTraderz to post or send:</p>
         <ul className="mb-4 ml-4 list-disc space-y-1">
-          <li>Contenido ofensivo, discriminatorio, de acoso o amenazante.</li>
-          <li>Spam, publicidad no relacionada, o publicaciones repetidas de forma abusiva.</li>
-          <li>Contenido ilegal, o que promueva actividades ilegales (por ejemplo, suplantación de ubicación con fines de estafa).</li>
-          <li>Intentos de estafa a otros usuarios, o suplantación de identidad.</li>
+          <li>Offensive, discriminatory, harassing, or threatening content.</li>
+          <li>Spam, unrelated advertising, or abusively repeated posts.</li>
+          <li>Illegal content, or content that promotes illegal activity (for example, location spoofing for scam purposes).</li>
+          <li>Attempts to scam other users, or identity impersonation.</li>
         </ul>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">5. Moderación</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">5. Moderation</h2>
         <p className="mb-4">
-          Podemos eliminar publicaciones, mensajes o cuentas que violen estas reglas, sin previo aviso y a nuestro
-          criterio, para mantener la comunidad utilizable para todos.
+          We may remove posts, messages, or accounts that violate these rules, without prior notice and at our
+          discretion, to keep the community usable for everyone.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">6. El servicio se ofrece &ldquo;tal cual&rdquo;</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">6. The service is provided &ldquo;as is&rdquo;</h2>
         <p className="mb-4">
-          GoTraderz se ofrece &ldquo;tal cual&rdquo; (&ldquo;as is&rdquo;) y &ldquo;según disponibilidad&rdquo;, sin garantías de ningún tipo, ni
-          explícitas ni implícitas, incluyendo (pero sin limitarse a) garantías de disponibilidad ininterrumpida,
-          ausencia de errores, o idoneidad para un propósito particular. Usás el servicio bajo tu propio riesgo.
+          GoTraderz is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo;, without warranties of any kind, either
+          express or implied, including (but not limited to) warranties of uninterrupted availability,
+          error-free operation, or fitness for a particular purpose. You use the service at your own risk.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. Cambios a estos términos</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. Changes to these terms</h2>
         <p className="mb-4">
-          Podemos actualizar estos términos ocasionalmente. Si hacemos cambios importantes, lo indicaremos
-          actualizando la fecha al inicio de esta página.
+          We may update these terms occasionally. If we make significant changes, we&apos;ll indicate this by
+          updating the date at the top of this page.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">8. Contacto</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">8. Contact</h2>
         <p className="mb-4">
-          Para consultas sobre estos términos, escribinos a{' '}
+          For questions about these terms, write to us at{' '}
           <a href="mailto:contact@gotraderz.com" className="text-[#2E9BF5] hover:underline">
             contact@gotraderz.com
           </a>.

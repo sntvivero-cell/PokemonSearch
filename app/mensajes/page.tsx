@@ -40,8 +40,8 @@ export default function MessagesListPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="text-base font-extrabold tracking-tight">Mensajes</h1>
-            <p className="text-xs text-[#5C6773]">Tus conversaciones</p>
+            <h1 className="text-base font-extrabold tracking-tight">Messages</h1>
+            <p className="text-xs text-[#5C6773]">Your conversations</p>
           </div>
         </div>
       </header>
@@ -55,9 +55,9 @@ export default function MessagesListPage() {
           </div>
         ) : !user ? (
           <p className="rounded-xl border border-[#232D38] bg-[#131A22] px-3 py-2.5 text-xs text-[#8792A0]">
-            Necesitás iniciar sesión para ver tus mensajes.{' '}
+            You need to sign in to see your messages.{' '}
             <Link href="/login" className="font-semibold text-[#2E9BF5] hover:underline">
-              Iniciar sesión
+              Sign in
             </Link>
           </p>
         ) : conversations.length === 0 ? (
@@ -65,9 +65,9 @@ export default function MessagesListPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2E9BF5]/10">
               <MessageCircle className="h-5 w-5 text-[#2E9BF5]" />
             </div>
-            <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">Todavía no tenés conversaciones</p>
+            <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">You don&apos;t have any conversations yet</p>
             <p className="mt-1 max-w-xs text-xs text-[#5C6773]">
-              Escribile a un entrenador desde su perfil para empezar a chatear.
+              Message a trainer from their profile to start chatting.
             </p>
           </div>
         ) : (
@@ -85,7 +85,7 @@ export default function MessagesListPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-sm font-semibold text-[#F4F6F8]">
-                      {c.otherUsername ?? 'Entrenador'}
+                      {c.otherUsername ?? 'Trainer'}
                     </p>
                     {c.lastMessage && (
                       <span className="shrink-0 text-[10px] text-[#5C6773]">
@@ -98,7 +98,7 @@ export default function MessagesListPage() {
                       c.hasUnread ? 'font-semibold text-[#8792A0]' : 'text-[#5C6773]'
                     }`}
                   >
-                    {c.lastMessage ? c.lastMessage.content : 'Sin mensajes todavía'}
+                    {c.lastMessage ? c.lastMessage.content : 'No messages yet'}
                   </p>
                 </div>
                 {c.hasUnread && <span className="h-2 w-2 shrink-0 rounded-full bg-[#2E9BF5]" />}

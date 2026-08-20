@@ -78,13 +78,13 @@ export function PokemonSearchPicker({ onSelect, accent = 'blue' }: PokemonSearch
 
   return (
     <div>
-      <label className="mb-2 block text-xs font-semibold text-[#8792A0]">Buscar Pokémon</label>
+      <label className="mb-2 block text-xs font-semibold text-[#8792A0]">Search Pokémon</label>
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5C6773]" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Nombre o número de Pokédex (ej. pikachu, 025)"
+          placeholder="Name or Pokédex number (e.g. pikachu, 025)"
           className={`w-full rounded-xl border border-[#232D38] bg-[#0B0F14] py-2.5 pl-9 pr-9 text-sm
                      text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition ${ACCENT_BORDER[accent]}`}
         />
@@ -93,11 +93,11 @@ export function PokemonSearchPicker({ onSelect, accent = 'blue' }: PokemonSearch
         )}
       </div>
 
-      {error && <p className="mt-2 text-xs text-[#FF3D3D]">Error al buscar: {error}</p>}
+      {error && <p className="mt-2 text-xs text-[#FF3D3D]">Search error: {error}</p>}
 
       {!error && !isLoading && results.length === 0 && (
         <p className="mt-3 text-xs text-[#5C6773]">
-          {query.trim() ? 'Sin resultados para esa búsqueda.' : 'Escribe para buscar un Pokémon.'}
+          {query.trim() ? 'No results for that search.' : 'Type to search for a Pokémon.'}
         </p>
       )}
 

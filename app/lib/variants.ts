@@ -56,7 +56,7 @@ export async function getOrCreateVariant(
     .single();
 
   if (insertError || !created) {
-    throw new Error(insertError?.message ?? 'No se pudo crear la variante del Pokémon.');
+    throw new Error(insertError?.message ?? 'Could not create the Pokémon variant.');
   }
 
   return created.id as string;

@@ -17,7 +17,7 @@ export function msUntilCooldownClears(lastActionAt: string, now: number = Date.n
 
 export function formatDuration(ms: number): string {
   const totalMinutes = Math.ceil(ms / 60000);
-  if (totalMinutes < 1) return 'menos de 1 min';
+  if (totalMinutes < 1) return 'less than 1 min';
   if (totalMinutes < 60) return `${totalMinutes} min`;
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
@@ -57,5 +57,5 @@ export function cooldownMessageFromRpcError(
   const secondsRemaining = Number(error.details);
   const ms = Number.isFinite(secondsRemaining) && secondsRemaining > 0 ? secondsRemaining * 1000 : COOLDOWN_MS;
 
-  return `Podés ${actionVerb} de nuevo en ${formatDuration(ms)}.`;
+  return `You can ${actionVerb} again in ${formatDuration(ms)}.`;
 }

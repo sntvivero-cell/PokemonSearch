@@ -103,7 +103,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
       const conversationId = await getOrCreateConversation(currentUser.id, userId);
       router.push(`/mensajes/${conversationId}`);
     } catch (err) {
-      setConversationError(err instanceof Error ? err.message : 'No se pudo abrir la conversación.');
+      setConversationError(err instanceof Error ? err.message : 'Could not open the conversation.');
       setIsStartingConversation(false);
     }
   }
@@ -126,7 +126,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
             <div>
               <div className="flex items-center gap-1.5">
                 <h1 className="text-base font-extrabold tracking-tight">
-                  {isLoading ? 'Cargando…' : (username ?? 'Entrenador')}
+                  {isLoading ? 'Loading…' : (username ?? 'Trainer')}
                 </h1>
                 {!isLoading && <RankBadge rank={rank} />}
                 {!isLoading && friendCode && (
@@ -135,7 +135,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#5C6773]">Publicaciones activas</p>
+              <p className="text-xs text-[#5C6773]">Active posts</p>
             </div>
           </div>
 
@@ -147,7 +147,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                          hover:text-[#F4F6F8]"
             >
               <Settings className="h-3.5 w-3.5" />
-              Editar perfil
+              Edit profile
             </Link>
           )}
 
@@ -161,7 +161,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                          disabled:opacity-50"
             >
               <MessageCircle className="h-3.5 w-3.5" />
-              {isStartingConversation ? 'Abriendo…' : 'Enviar mensaje'}
+              {isStartingConversation ? 'Opening…' : 'Send message'}
             </button>
           )}
         </div>
@@ -181,7 +181,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
           </div>
         ) : loadError ? (
           <p className="rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
-            No se pudieron cargar las publicaciones: {loadError}
+            Could not load posts: {loadError}
           </p>
         ) : trades.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#232D38] py-20 text-center">
@@ -189,7 +189,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
               <Sparkles className="h-5 w-5 text-[#2E9BF5]" />
             </div>
             <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">
-              {isOwnProfile ? 'Todavía no publicaste ningún trade' : 'Este entrenador no tiene publicaciones activas'}
+              {isOwnProfile ? "You haven't posted any trades yet" : 'This trainer has no active posts'}
             </p>
           </div>
         ) : (

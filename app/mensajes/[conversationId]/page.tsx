@@ -60,7 +60,7 @@ export default function ChatPage({ params }: ChatPageProps) {
         return;
       }
       if (!conversation) {
-        setLoadError('No se encontró esta conversación.');
+        setLoadError('This conversation was not found.');
         setIsLoading(false);
         return;
       }
@@ -146,7 +146,7 @@ export default function ChatPage({ params }: ChatPageProps) {
     const trimmed = draft.trim();
     if (!trimmed || !user) return;
     if (trimmed.length > MAX_MESSAGE_LENGTH) {
-      setSendError(`El mensaje no puede superar los ${MAX_MESSAGE_LENGTH} caracteres.`);
+      setSendError(`Message cannot exceed ${MAX_MESSAGE_LENGTH} characters.`);
       return;
     }
 
@@ -159,7 +159,7 @@ export default function ChatPage({ params }: ChatPageProps) {
     setIsSending(false);
 
     if (error) {
-      setSendError(`No se pudo enviar: ${error.message}`);
+      setSendError(`Could not send: ${error.message}`);
       return;
     }
 
@@ -169,7 +169,7 @@ export default function ChatPage({ params }: ChatPageProps) {
   if (isUserLoading || isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-[#F4F6F8]">
-        <p className="text-xs text-[#5C6773]">Cargando conversación…</p>
+        <p className="text-xs text-[#5C6773]">Loading conversation…</p>
       </main>
     );
   }
@@ -177,9 +177,9 @@ export default function ChatPage({ params }: ChatPageProps) {
   if (!user) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#0B0F14] px-4 text-center text-[#F4F6F8]">
-        <p className="text-sm font-semibold">Necesitás iniciar sesión para ver esta conversación.</p>
+        <p className="text-sm font-semibold">You need to sign in to see this conversation.</p>
         <Link href="/login" className="mt-2 text-xs font-semibold text-[#2E9BF5] hover:underline">
-          Iniciar sesión
+          Sign in
         </Link>
       </main>
     );
@@ -188,9 +188,9 @@ export default function ChatPage({ params }: ChatPageProps) {
   if (forbidden) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#0B0F14] px-4 text-center text-[#F4F6F8]">
-        <p className="text-sm font-semibold">No tenés acceso a esta conversación.</p>
+        <p className="text-sm font-semibold">You don&apos;t have access to this conversation.</p>
         <Link href="/mensajes" className="mt-2 text-xs font-semibold text-[#2E9BF5] hover:underline">
-          Volver a mensajes
+          Back to messages
         </Link>
       </main>
     );
@@ -201,7 +201,7 @@ export default function ChatPage({ params }: ChatPageProps) {
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#0B0F14] px-4 text-center text-[#F4F6F8]">
         <p className="text-sm font-semibold text-[#FF3D3D]">{loadError}</p>
         <Link href="/mensajes" className="mt-2 text-xs font-semibold text-[#2E9BF5] hover:underline">
-          Volver a mensajes
+          Back to messages
         </Link>
       </main>
     );
@@ -223,7 +223,7 @@ export default function ChatPage({ params }: ChatPageProps) {
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2E9BF5]/10">
                 <User className="h-4 w-4 text-[#2E9BF5]" />
               </div>
-              <h1 className="text-sm font-extrabold tracking-tight">{otherUsername ?? 'Entrenador'}</h1>
+              <h1 className="text-sm font-extrabold tracking-tight">{otherUsername ?? 'Trainer'}</h1>
             </Link>
           )}
         </div>
@@ -231,7 +231,7 @@ export default function ChatPage({ params }: ChatPageProps) {
 
       <div className="mx-auto flex w-full min-h-0 max-w-2xl flex-1 flex-col gap-2 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
-          <p className="mt-10 text-center text-xs text-[#5C6773]">Todavía no hay mensajes. Escribí el primero.</p>
+          <p className="mt-10 text-center text-xs text-[#5C6773]">No messages yet. Write the first one.</p>
         ) : (
           messages.map((m) => {
             const isMine = m.sender_id === user.id;
@@ -244,7 +244,7 @@ export default function ChatPage({ params }: ChatPageProps) {
                 >
                   <p className="whitespace-pre-wrap break-words">{m.content}</p>
                   <p className={`mt-1 text-right text-[9px] ${isMine ? 'text-white/70' : 'text-[#5C6773]'}`}>
-                    {new Date(m.created_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(m.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function ChatPage({ params }: ChatPageProps) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH}
-            placeholder="Escribí un mensaje…"
+            placeholder="Write a message…"
             style={{ fontSize: '16px' }}
             className="flex-1 rounded-full border border-[#232D38] bg-[#131A22] px-4 py-2.5
                        text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition focus:border-[#2E9BF5]"

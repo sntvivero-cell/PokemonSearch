@@ -52,16 +52,16 @@ export function CookieConsentBanner() {
   return (
     <div
       role="dialog"
-      aria-label="Consentimiento de cookies"
+      aria-label="Cookie consent"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-[#232D38] bg-[#131A22] px-4 py-4
                  shadow-[0_-4px_20px_rgba(0,0,0,0.4)]"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-relaxed text-[#8792A0]">
-          Usamos únicamente cookies técnicas esenciales para mantener tu sesión iniciada (autenticación vía
-          Supabase). No usamos cookies de analítica ni de publicidad. Más info en nuestra{' '}
+          We only use essential technical cookies to keep you signed in (Supabase authentication). We don&apos;t
+          use analytics or advertising cookies. More info in our{' '}
           <Link href="/legal/privacidad" className="font-semibold text-[#2E9BF5] hover:underline">
-            Política de Privacidad
+            Privacy Policy
           </Link>
           .
         </p>
@@ -72,7 +72,7 @@ export function CookieConsentBanner() {
             className="flex-1 rounded-full border border-[#232D38] px-4 py-2 text-xs font-semibold
                        text-[#F4F6F8] transition hover:border-[#3A4C63] sm:flex-none"
           >
-            Rechazar
+            Reject
           </button>
           <button
             type="button"
@@ -80,7 +80,7 @@ export function CookieConsentBanner() {
             className="flex-1 rounded-full bg-[#2E9BF5] px-4 py-2 text-xs font-semibold text-white
                        transition hover:bg-[#2589db] sm:flex-none"
           >
-            Aceptar
+            Accept
           </button>
         </div>
       </div>

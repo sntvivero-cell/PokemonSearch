@@ -90,7 +90,7 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
       <div className="flex-1 rounded-xl border border-[#232D38] bg-[#0B0F14] p-2">
         <div className="flex h-full flex-col items-center justify-center gap-1 rounded-lg border border-[#232D38] bg-[#131A22] px-2 py-4 text-center">
           <HelpCircle className="h-5 w-5 shrink-0 text-[#FF3D3D]" />
-          <span className="text-[10px] font-bold uppercase tracking-wide text-[#FF3D3D]">Busco ofertas</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-[#FF3D3D]">Looking for offers</span>
         </div>
       </div>
     );
@@ -99,7 +99,7 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
   if (variants.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-[#232D38] px-2 py-4 text-center">
-        <span className="text-[10px] text-[#5C6773]">Sin especificar</span>
+        <span className="text-[10px] text-[#5C6773]">Not specified</span>
       </div>
     );
   }
@@ -116,7 +116,7 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
         {remaining > 0 && (
           <div className="flex flex-col items-center justify-center rounded-lg border border-[#232D38] bg-[#131A22] py-1.5 text-center">
             <span className="text-[11px] font-bold text-[#8792A0]">+{remaining}</span>
-            <span className="text-[7px] font-semibold uppercase tracking-wide text-[#5C6773]">más</span>
+            <span className="text-[7px] font-semibold uppercase tracking-wide text-[#5C6773]">more</span>
           </div>
         )}
       </div>
@@ -166,7 +166,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
 
       setIsTogglingSave(false);
       if (error) {
-        setSaveError('No se pudo quitar de guardados.');
+        setSaveError('Could not remove from saved.');
         return;
       }
       setOptimisticSaved(false);
@@ -180,7 +180,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
 
     setIsTogglingSave(false);
     if (error) {
-      setSaveError('No se pudo guardar.');
+      setSaveError('Could not save.');
       return;
     }
     setOptimisticSaved(true);
@@ -205,14 +205,14 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
       const conversationId = await getOrCreateConversation(currentUserId, trade.user_id);
       router.push(`/mensajes/${conversationId}`);
     } catch (err) {
-      setConversationError(err instanceof Error ? err.message : 'No se pudo abrir la conversación.');
+      setConversationError(err instanceof Error ? err.message : 'Could not open the conversation.');
       setIsStartingConversation(false);
     }
   }
 
   async function handleDelete() {
     const confirmed = window.confirm(
-      '¿Eliminar esta publicación? Se van a borrar todos los Pokémon de ambos lados (ofreces y buscas). Esta acción no se puede deshacer.'
+      'Delete this post? All Pokémon on both sides (offering and looking for) will be removed. This action cannot be undone.'
     );
     if (!confirmed) return;
 
@@ -228,7 +228,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
     setIsDeleting(false);
 
     if (error) {
-      setDeleteError(`No se pudo eliminar: ${error.message}`);
+      setDeleteError(`Could not delete: ${error.message}`);
       return;
     }
 
@@ -248,7 +248,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
           {trade.trinket_choice !== 'none' && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#2E9BF5]/15 px-2.5 py-1 text-[10px] font-bold uppercase text-[#2E9BF5]">
               <Image src="/trinket2.jpg" alt="" width={12} height={12} className="object-contain" />
-              {trade.trinket_choice === 'self' ? 'Mi trinket' : 'Tu trinket'}
+              {trade.trinket_choice === 'self' ? 'My trinket' : 'Your trinket'}
             </span>
           )}
         </div>
@@ -257,7 +257,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
       <div className="flex items-start gap-2">
         <div className="flex flex-1 flex-col">
           <p className="mb-1.5 text-center text-[9px] font-bold uppercase tracking-wide text-[#2E9BF5]">
-            Ofrece{trade.offering.length > 0 && ` (${trade.offering.length})`}
+            Offering{trade.offering.length > 0 && ` (${trade.offering.length})`}
           </p>
           <VariantSide variants={trade.offering} />
         </div>
@@ -266,7 +266,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
 
         <div className="flex flex-1 flex-col">
           <p className="mb-1.5 text-center text-[9px] font-bold uppercase tracking-wide text-[#FF3D3D]">
-            Busca{trade.lookingFor.length > 0 && ` (${trade.lookingFor.length})`}
+            Looking for{trade.lookingFor.length > 0 && ` (${trade.lookingFor.length})`}
           </p>
           <VariantSide variants={trade.lookingFor} openToOffers={trade.open_to_offers} />
         </div>
@@ -274,7 +274,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
 
       {trade.quantity > 1 && (
         <p className="mt-3 text-center text-[10px] font-semibold text-[#8792A0]">
-          Cantidad: ×{trade.quantity}
+          Quantity: ×{trade.quantity}
         </p>
       )}
 
@@ -296,7 +296,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
                 type="button"
                 onClick={handleMessage}
                 disabled={isStartingConversation}
-                title="Enviar mensaje"
+                title="Send message"
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border
                            border-[#232D38] text-[#8792A0] transition hover:border-[#2E9BF5]
                            hover:text-[#2E9BF5] disabled:cursor-not-allowed disabled:opacity-50"
@@ -308,7 +308,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
         ) : (
           <div className="flex items-center gap-1.5 text-xs text-[#8792A0]">
             <User className="h-3.5 w-3.5" />
-            Entrenador
+            Trainer
           </div>
         )}
         <div className="flex shrink-0 items-center gap-2">
@@ -320,7 +320,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
               type="button"
               onClick={handleToggleSave}
               disabled={isTogglingSave}
-              title={saved ? 'Quitar de guardados' : 'Guardar'}
+              title={saved ? 'Remove from saved' : 'Save'}
               aria-pressed={saved}
               className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition
                           disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -345,7 +345,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
                        hover:text-[#F4F6F8]"
           >
             <Pencil className="h-3 w-3" />
-            Editar
+            Edit
           </Link>
           <button
             type="button"
@@ -357,7 +357,7 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
                        disabled:opacity-50"
           >
             <Trash2 className="h-3 w-3" />
-            {isDeleting ? 'Eliminando…' : 'Eliminar'}
+            {isDeleting ? 'Deleting…' : 'Delete'}
           </button>
         </div>
       )}

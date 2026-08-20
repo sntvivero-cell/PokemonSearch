@@ -28,13 +28,13 @@ export async function POST(request: NextRequest) {
   const username = typeof body?.username === 'string' ? body.username.trim() : '';
 
   if (!username) {
-    return NextResponse.json({ error: 'Falta username.' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing username.' }, { status: 400 });
   }
 
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) {
     return NextResponse.json(
-      { error: 'Falta SUPABASE_SERVICE_ROLE_KEY en las variables de entorno del servidor.' },
+      { error: 'Missing SUPABASE_SERVICE_ROLE_KEY in server environment variables.' },
       { status: 500 }
     );
   }

@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "./components/layout/Footer";
 import { CookieConsentBanner } from "./components/layout/CookieConsentBanner";
-import { GoogleTranslate } from "./components/layout/GoogleTranslate";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -18,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GoTraderz",
-  description: "Tablón de intercambios de la comunidad de Pokémon GO",
+  description: "Pokémon GO community trading board",
   icons: {
     icon: "/icon-512.png",
     apple: "/apple-touch-icon.png",
@@ -37,7 +36,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <GoogleTranslate />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />

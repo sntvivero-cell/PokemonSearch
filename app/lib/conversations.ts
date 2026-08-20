@@ -10,7 +10,7 @@ import type { ConversationSummary } from '@/app/types/messages';
 // porque ya existe, y volvemos a leer la fila que ganó la carrera.
 export async function getOrCreateConversation(currentUserId: string, otherUserId: string): Promise<string> {
   if (currentUserId === otherUserId) {
-    throw new Error('No podés iniciar una conversación con vos mismo.');
+    throw new Error('You can\'t start a conversation with yourself.');
   }
 
   const [userA, userB] = [currentUserId, otherUserId].sort();
@@ -41,7 +41,7 @@ export async function getOrCreateConversation(currentUserId: string, otherUserId
     .single();
 
   if (afterRaceError || !afterRace) {
-    throw new Error(afterRaceError?.message ?? 'No se pudo crear ni encontrar la conversación.');
+    throw new Error(afterRaceError?.message ?? 'Could not create or find the conversation.');
   }
 
   return afterRace.id as string;

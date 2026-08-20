@@ -102,7 +102,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
 
       const rows = (data as unknown as RawGroupRow[]) ?? [];
       if (rows.length === 0) {
-        setLoadError('No se encontró esta publicación (puede que ya no exista).');
+        setLoadError('This post was not found (it may no longer exist).');
         setIsLoadingGroup(false);
         return;
       }
@@ -130,7 +130,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
   }, [user, isUserLoading, tradeGroupId, router]);
 
   async function handleSubmit(values: TradeFormValues): Promise<string | null> {
-    if (!user) return 'Necesitás iniciar sesión.';
+    if (!user) return 'You need to sign in.';
 
     const offering = configuredSlots(values.offering);
     const seeking = configuredSlots(values.seeking);
@@ -147,7 +147,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
         ),
       ]);
     } catch (err) {
-      return err instanceof Error ? err.message : 'No se pudo preparar alguna de las variantes.';
+      return err instanceof Error ? err.message : 'Could not prepare one of the variants.';
     }
 
     // publish_trade_group() hace el DELETE + INSERT de este grupo en un solo paso
@@ -182,9 +182,9 @@ export default function EditTradePage({ params }: EditTradePageProps) {
       p_rows: rows,
     });
     if (rpcError) {
-      const cooldownMessage = cooldownMessageFromRpcError(rpcError, 'editar');
+      const cooldownMessage = cooldownMessageFromRpcError(rpcError, 'edit');
       if (cooldownMessage) return cooldownMessage;
-      return `No se pudo guardar la publicación: ${rpcError.message}`;
+      return `Could not save the post: ${rpcError.message}`;
     }
 
     setShowSuccessToast(true);
@@ -197,7 +197,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
   if (isUserLoading || isLoadingGroup) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-[#F4F6F8]">
-        <p className="text-xs text-[#5C6773]">Cargando publicación…</p>
+        <p className="text-xs text-[#5C6773]">Loading post…</p>
       </main>
     );
   }
@@ -205,10 +205,10 @@ export default function EditTradePage({ params }: EditTradePageProps) {
   if (forbidden) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#0B0F14] px-4 text-center text-[#F4F6F8]">
-        <p className="text-sm font-semibold">No podés editar esta publicación.</p>
-        <p className="text-xs text-[#5C6773]">Esta publicación pertenece a otro entrenador.</p>
+        <p className="text-sm font-semibold">You can&apos;t edit this post.</p>
+        <p className="text-xs text-[#5C6773]">This post belongs to another trainer.</p>
         <Link href="/" className="mt-2 text-xs font-semibold text-[#2E9BF5] hover:underline">
-          Volver al feed
+          Back to feed
         </Link>
       </main>
     );
@@ -219,7 +219,7 @@ export default function EditTradePage({ params }: EditTradePageProps) {
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#0B0F14] px-4 text-center text-[#F4F6F8]">
         <p className="text-sm font-semibold text-[#FF3D3D]">{loadError}</p>
         <Link href="/" className="mt-2 text-xs font-semibold text-[#2E9BF5] hover:underline">
-          Volver al feed
+          Back to feed
         </Link>
       </main>
     );
@@ -237,8 +237,8 @@ export default function EditTradePage({ params }: EditTradePageProps) {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="text-base font-extrabold tracking-tight">Editar trade</h1>
-            <p className="text-xs text-[#5C6773]">Actualizá qué ofreces y qué buscás a cambio</p>
+            <h1 className="text-base font-extrabold tracking-tight">Edit trade</h1>
+            <p className="text-xs text-[#5C6773]">Update what you&apos;re offering and looking for</p>
           </div>
         </div>
       </header>
@@ -256,14 +256,14 @@ export default function EditTradePage({ params }: EditTradePageProps) {
         isUserReady={!isUserLoading}
         isLoggedIn={!!user}
         userId={user?.id ?? null}
-        cooldownActionVerb="editar"
-        submitLabel="Guardar cambios"
-        submittingLabel="Guardando…"
+        cooldownActionVerb="edit"
+        submitLabel="Save changes"
+        submittingLabel="Saving…"
         onSubmit={handleSubmit}
         cancelHref="/"
       />
 
-      {showSuccessToast && <Toast message="Trade actualizado. Redirigiendo…" />}
+      {showSuccessToast && <Toast message="Trade updated. Redirecting…" />}
     </main>
   );
 }

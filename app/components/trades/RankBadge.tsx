@@ -12,6 +12,15 @@ const RANK_ACCENTS: Record<string, string> = {
   Entrenador: '#8792A0',
 };
 
+// Etiquetas visibles en inglés para los valores de rank que devuelve
+// public.get_user_rank() (ver migración 0008) — las claves de arriba deben seguir
+// coincidiendo con esos valores exactos, esto solo traduce lo que se muestra.
+const RANK_DISPLAY_LABELS: Record<string, string> = {
+  Élite: 'Elite',
+  Veterano: 'Veteran',
+  Entrenador: 'Trainer',
+};
+
 // 'Novato' (y `rank` null, perfil sin resolver todavía) no muestran badge a propósito:
 // es el rango de entrada, no tiene sentido saturar visualmente a cada usuario nuevo.
 export function RankBadge({ rank }: RankBadgeProps) {
@@ -25,7 +34,7 @@ export function RankBadge({ rank }: RankBadgeProps) {
         style={{ background: 'linear-gradient(90deg, #FFCB05, #7B5CB8)' }}
       >
         <Crown className="h-2.5 w-2.5" />
-        Desarrollador
+        Developer
       </span>
     );
   }
@@ -39,7 +48,7 @@ export function RankBadge({ rank }: RankBadgeProps) {
                  uppercase tracking-wide"
       style={{ backgroundColor: `${accent}26`, color: accent }}
     >
-      {rank}
+      {RANK_DISPLAY_LABELS[rank] ?? rank}
     </span>
   );
 }

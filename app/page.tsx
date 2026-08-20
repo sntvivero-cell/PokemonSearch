@@ -15,7 +15,6 @@ import type { TradePost } from '@/app/types/trades';
 import { TradeCard } from '@/app/components/trades/TradeCard';
 import { EmptyState } from '@/app/components/trades/EmptyState';
 import { Toast } from '@/app/components/publish/Toast';
-import { LanguageToggleButton } from '@/app/components/layout/LanguageToggleButton';
 
 // Sin importar mayúsculas/acentos: "pikachu" debe matchear "Pikachú" o "PIKACHU".
 function normalize(value: string): string {
@@ -156,7 +155,7 @@ export default function HomePage() {
               {/* Oculto por completo debajo de md: es lo primero que sobra cuando no
                  hay ancho para todo, y no aporta nada que el resto de la UI no diga
                  ya (el feed de abajo deja clarísimo que esto es un tablón de trades). */}
-              <p className="hidden text-xs text-[#5C6773] md:block">Tablón de intercambios de la comunidad</p>
+              <p className="hidden text-xs text-[#5C6773] md:block">Community trading board</p>
             </div>
           </div>
 
@@ -175,7 +174,7 @@ export default function HomePage() {
                                    hover:text-[#F4F6F8]"
                       >
                         <LogOut className="h-3.5 w-3.5" />
-                        Cerrar sesión
+                        Sign out
                       </button>
                     </div>
                   ) : (
@@ -186,7 +185,7 @@ export default function HomePage() {
                                  hover:text-[#F4F6F8]"
                     >
                       <LogIn className="h-3.5 w-3.5" />
-                      Iniciar sesión
+                      Sign in
                     </Link>
                   )}
                 </>
@@ -199,7 +198,7 @@ export default function HomePage() {
                              hover:text-[#F4F6F8]"
                 >
                   <MessageCircle className="h-3.5 w-3.5" />
-                  Mensajes
+                  Messages
                   {unreadConversations > 0 && (
                     <span
                       className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center
@@ -218,20 +217,19 @@ export default function HomePage() {
                              hover:text-[#F4F6F8]"
                 >
                   <Bookmark className="h-3.5 w-3.5" />
-                  Guardados
+                  Saved
                 </Link>
               )}
               {user && (
                 <Link
                   href="/configuracion"
-                  aria-label="Configuración"
+                  aria-label="Settings"
                   className="flex h-8 w-8 items-center justify-center rounded-full border border-[#232D38]
                              text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
                 >
                   <Settings className="h-3.5 w-3.5" />
                 </Link>
               )}
-              <LanguageToggleButton />
             </div>
 
             {/* Mobile (<md): todo lo de arriba colapsa acá, para no competir por
@@ -241,7 +239,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen((open) => !open)}
-                aria-label="Menú"
+                aria-label="Menu"
                 aria-expanded={isMobileMenuOpen}
                 className="relative flex h-9 w-9 items-center justify-center rounded-full border
                            border-[#232D38] text-[#8792A0] transition hover:border-[#3A4C63]
@@ -274,7 +272,7 @@ export default function HomePage() {
                                        hover:text-[#F4F6F8]"
                           >
                             <LogOut className="h-4 w-4 shrink-0" />
-                            Cerrar sesión
+                            Sign out
                           </button>
                         ) : (
                           <Link
@@ -284,7 +282,7 @@ export default function HomePage() {
                                        text-[#8792A0] transition hover:bg-[#0B0F14] hover:text-[#F4F6F8]"
                           >
                             <LogIn className="h-4 w-4 shrink-0" />
-                            Iniciar sesión
+                            Sign in
                           </Link>
                         )}
                       </>
@@ -299,7 +297,7 @@ export default function HomePage() {
                       >
                         <span className="flex items-center gap-2">
                           <MessageCircle className="h-4 w-4 shrink-0" />
-                          Mensajes
+                          Messages
                         </span>
                         {unreadConversations > 0 && (
                           <span
@@ -319,7 +317,7 @@ export default function HomePage() {
                                    text-[#8792A0] transition hover:bg-[#0B0F14] hover:text-[#F4F6F8]"
                       >
                         <Bookmark className="h-4 w-4 shrink-0" />
-                        Guardados
+                        Saved
                       </Link>
                     )}
                     {user && (
@@ -330,13 +328,9 @@ export default function HomePage() {
                                    text-[#8792A0] transition hover:bg-[#0B0F14] hover:text-[#F4F6F8]"
                       >
                         <Settings className="h-4 w-4 shrink-0" />
-                        Configuración
+                        Settings
                       </Link>
                     )}
-                    <div className="flex items-center justify-between rounded-xl px-3 py-1.5 text-xs font-semibold text-[#8792A0]">
-                      Idioma
-                      <LanguageToggleButton />
-                    </div>
                   </div>
                 </>
               )}
@@ -344,12 +338,12 @@ export default function HomePage() {
 
             <Link
               href="/publicar"
-              aria-label="Nuevo Trade"
+              aria-label="New Trade"
               className="flex items-center gap-1.5 rounded-full bg-[#2E9BF5] px-3 py-2 text-xs
                          font-semibold text-white transition hover:bg-[#2589db] sm:px-4"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Nuevo Trade</span>
+              <span className="hidden sm:inline">New Trade</span>
             </Link>
           </div>
         </div>
@@ -363,14 +357,14 @@ export default function HomePage() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Buscar Pokémon en el foro…"
+              placeholder="Search Pokémon in the feed…"
               className="w-full rounded-full border border-[#232D38] bg-[#131A22] py-2 pl-9 pr-3 text-sm
                          text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
                          focus:border-[#2E9BF5]"
             />
           </div>
           <p className="text-xs text-[#5C6773]">
-            {isLoading ? 'Cargando publicaciones…' : `${filteredTrades.length} publicaciones`}
+            {isLoading ? 'Loading posts…' : `${filteredTrades.length} posts`}
           </p>
         </div>
 
@@ -400,7 +394,7 @@ export default function HomePage() {
 
       {showWelcomeToast && (
         <Toast
-          message="🎉 ¡Bienvenido a GoTraderz! Tu cuenta está confirmada"
+          message="🎉 Welcome to GoTraderz! Your account is confirmed"
           duration={3000}
           onDismiss={() => setShowWelcomeToast(false)}
         />

@@ -43,8 +43,8 @@ interface TradeSideListProps {
 }
 
 const SIDE_COPY: Record<'offer' | 'seek', { label: string; accent: 'blue' | 'red' }> = {
-  offer: { label: 'Ofrezco', accent: 'blue' },
-  seek: { label: 'Busco a cambio', accent: 'red' },
+  offer: { label: 'Offering', accent: 'blue' },
+  seek: { label: 'Looking for', accent: 'red' },
 };
 
 export function TradeSideList({ side, slots, onChange, backgrounds, disabled = false }: TradeSideListProps) {
@@ -84,8 +84,8 @@ export function TradeSideList({ side, slots, onChange, backgrounds, disabled = f
       {disabled ? (
         <div className="flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#232D38] px-3 py-8 text-center">
           <HelpCircle className="h-5 w-5 text-[#5C6773]" />
-          <p className="text-xs font-semibold text-[#8792A0]">Buscando ofertas</p>
-          <p className="text-[10px] text-[#5C6773]">No se pide un Pokémon específico.</p>
+          <p className="text-xs font-semibold text-[#8792A0]">Looking for offers</p>
+          <p className="text-[10px] text-[#5C6773]">No specific Pokémon requested.</p>
         </div>
       ) : (
         <>
@@ -96,7 +96,7 @@ export function TradeSideList({ side, slots, onChange, backgrounds, disabled = f
                   <button
                     type="button"
                     onClick={() => removeSlot(slot.id)}
-                    aria-label="Quitar este Pokémon"
+                    aria-label="Remove this Pokémon"
                     className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center
                                rounded-full border border-[#232D38] bg-[#131A22] text-[#8792A0] transition
                                hover:border-[#FF3D3D]/60 hover:text-[#FF3D3D]"
@@ -142,7 +142,7 @@ export function TradeSideList({ side, slots, onChange, backgrounds, disabled = f
                        disabled:hover:border-[#232D38] disabled:hover:text-[#8792A0]"
           >
             <Plus className="h-3.5 w-3.5" />
-            {atLimit ? 'Máximo 10 por publicación' : 'Añadir otro Pokémon'}
+            {atLimit ? 'Maximum 10 per post' : 'Add another Pokémon'}
           </button>
         </>
       )}

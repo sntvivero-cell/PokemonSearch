@@ -79,15 +79,15 @@ export default function LoginPage() {
 
     const trimmedUsername = username.trim();
     if (!trimmedUsername) {
-      setError('Elegí un nombre de usuario.');
+      setError('Choose a username.');
       return;
     }
     if (trimmedUsername.length < USERNAME_MIN_LENGTH || trimmedUsername.length > USERNAME_MAX_LENGTH) {
-      setError(`El nombre de usuario debe tener entre ${USERNAME_MIN_LENGTH} y ${USERNAME_MAX_LENGTH} caracteres.`);
+      setError(`Username must be between ${USERNAME_MIN_LENGTH} and ${USERNAME_MAX_LENGTH} characters.`);
       return;
     }
     if (/\s/.test(trimmedUsername)) {
-      setError('El nombre de usuario no puede tener espacios.');
+      setError('Username cannot contain spaces.');
       return;
     }
 
@@ -110,7 +110,7 @@ export default function LoginPage() {
       .catch(() => ({}));
 
     if (checkResult.status === 'taken') {
-      setError('Ese nombre de usuario ya está en uso.');
+      setError('That username is already taken.');
       setIsSubmitting(false);
       return;
     }
@@ -132,7 +132,7 @@ export default function LoginPage() {
     });
     if (signUpError) {
       if (/database error/i.test(signUpError.message)) {
-        setError('Ese nombre de usuario ya está en uso.');
+        setError('That username is already taken.');
       } else {
         setError(signUpError.message);
       }
@@ -170,7 +170,7 @@ export default function LoginPage() {
           className="mb-6 flex items-center gap-1.5 text-xs font-semibold text-[#8792A0] transition hover:text-[#F4F6F8]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al feed
+          Back to feed
         </Link>
 
         <div className="rounded-2xl border border-[#232D38] bg-[#131A22] p-6">
@@ -179,12 +179,12 @@ export default function LoginPage() {
               <Sparkles className="h-5 w-5 text-[#2E9BF5]" />
             </div>
             <h1 className="mt-3 text-base font-extrabold tracking-tight">
-              {mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
+              {mode === 'login' ? 'Sign in' : 'Create account'}
             </h1>
             <p className="mt-1 text-xs text-[#5C6773]">
               {mode === 'login'
-                ? 'Entrá para publicar y gestionar tus trades'
-                : 'Registrate para empezar a intercambiar'}
+                ? 'Sign in to post and manage your trades'
+                : 'Sign up to start trading'}
             </p>
           </div>
 
@@ -199,7 +199,7 @@ export default function LoginPage() {
                 mode === 'login' ? 'bg-[#2E9BF5] text-white' : 'text-[#8792A0] hover:text-[#F4F6F8]'
               }`}
             >
-              Iniciar sesión
+              Sign in
             </button>
             <button
               type="button"
@@ -211,14 +211,14 @@ export default function LoginPage() {
                 mode === 'signup' ? 'bg-[#2E9BF5] text-white' : 'text-[#8792A0] hover:text-[#F4F6F8]'
               }`}
             >
-              Crear cuenta
+              Create account
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             {mode === 'signup' && (
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Nombre de usuario</label>
+                <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Username</label>
                 <input
                   type="text"
                   required
@@ -226,7 +226,7 @@ export default function LoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   minLength={USERNAME_MIN_LENGTH}
                   maxLength={USERNAME_MAX_LENGTH}
-                  placeholder="ej. AshKetchum10"
+                  placeholder="e.g. AshKetchum10"
                   className="w-full rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2 text-sm
                              text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
                              focus:border-[#2E9BF5]"
@@ -241,7 +241,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="entrenador@ejemplo.com"
+                placeholder="trainer@example.com"
                 className="w-full rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2 text-sm
                            text-[#F4F6F8] placeholder:text-[#5C6773] outline-none transition
                            focus:border-[#2E9BF5]"
@@ -249,7 +249,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Contraseña</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[#8792A0]">Password</label>
               <input
                 type="password"
                 required
@@ -271,13 +271,13 @@ export default function LoginPage() {
 
             {confirmEmailNotice && (
               <p className="rounded-xl border border-[#2E9BF5]/40 bg-[#2E9BF5]/10 px-3 py-2.5 text-xs font-semibold text-[#2E9BF5]">
-                Cuenta creada. Revisá tu email para confirmarla antes de iniciar sesión.
+                Account created. Check your email to confirm it before signing in.
               </p>
             )}
 
             {existingAccountNotice && (
               <p className="rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
-                Ya existe una cuenta con ese email.{' '}
+                An account with that email already exists.{' '}
                 <button
                   type="button"
                   onClick={() => {
@@ -287,7 +287,7 @@ export default function LoginPage() {
                   }}
                   className="underline underline-offset-2 hover:text-white"
                 >
-                  ¿Querés iniciar sesión?
+                  Want to sign in?
                 </button>
               </p>
             )}
@@ -295,11 +295,11 @@ export default function LoginPage() {
             {unconfirmedUsernameNotice && (
               <div className="rounded-xl border border-[#FFCB05]/40 bg-[#FFCB05]/10 px-3 py-2.5 text-xs font-semibold text-[#FFCB05]">
                 <p>
-                  Ya intentaste registrarte con este nombre de usuario antes, pero nunca confirmaste el email.
-                  Si el email de arriba es el mismo que usaste esa vez, te podemos reenviar el link de confirmación.
+                  You already tried signing up with this username before, but never confirmed the email.
+                  If the email above is the same one you used that time, we can resend you the confirmation link.
                 </p>
                 {resendSuccess ? (
-                  <p className="mt-2 text-[#2E9BF5]">Listo, te reenviamos el link. Revisá tu email.</p>
+                  <p className="mt-2 text-[#2E9BF5]">Done, we resent the link. Check your email.</p>
                 ) : (
                   <button
                     type="button"
@@ -309,7 +309,7 @@ export default function LoginPage() {
                                text-[#FFCB05] transition hover:bg-[#FFCB05]/10 disabled:cursor-not-allowed
                                disabled:opacity-50"
                   >
-                    {isResending ? 'Reenviando…' : 'Reenviar link de confirmación'}
+                    {isResending ? 'Resending…' : 'Resend confirmation link'}
                   </button>
                 )}
                 {resendError && <p className="mt-2 text-[#FF3D3D]">{resendError}</p>}
@@ -323,10 +323,10 @@ export default function LoginPage() {
                          transition hover:bg-[#2589db] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting
-                ? 'Procesando…'
+                ? 'Processing…'
                 : mode === 'login'
-                  ? 'Iniciar sesión'
-                  : 'Crear cuenta'}
+                  ? 'Sign in'
+                  : 'Create account'}
             </button>
           </form>
         </div>

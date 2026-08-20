@@ -19,32 +19,32 @@ export function Footer() {
     <footer className="shrink-0 border-t border-[#232D38] bg-[#0B0F14] px-4 py-6">
       <nav className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-semibold text-[#8792A0]">
         <Link href="/legal/privacidad" className="transition hover:text-[#F4F6F8]">
-          Política de Privacidad
+          Privacy Policy
         </Link>
         <Link href="/legal/terminos" className="transition hover:text-[#F4F6F8]">
-          Términos de Uso
+          Terms of Use
         </Link>
         <Link href="/contacto" className="transition hover:text-[#F4F6F8]">
-          Contacto
+          Contact
         </Link>
         <Link href="/status" className="transition hover:text-[#F4F6F8]">
-          Estado del sitio
+          Site Status
         </Link>
         <a
           href="https://www.tiktok.com/@gotraderz.oficial"
           target="_blank"
           rel="noopener noreferrer"
-          title="Síguenos en TikTok"
+          title="Follow us on TikTok"
           className="flex items-center gap-1.5 transition hover:text-[#F4F6F8]"
         >
           <TikTokIcon className="h-3.5 w-3.5" />
-          Síguenos en TikTok
+          Follow us on TikTok
         </a>
       </nav>
       <p className="mx-auto max-w-2xl text-center text-[10px] leading-relaxed text-[#5C6773]">
-        GoTraderz no está afiliado, respaldado ni asociado con Niantic, Inc., The Pokémon Company, Nintendo o Game
-        Freak. Pokémon y Pokémon GO son marcas registradas de sus respectivos dueños. Este es un proyecto
-        independiente de fans, no oficial.
+        GoTraderz is not affiliated with, endorsed by, or associated with Niantic, Inc., The Pokémon Company,
+        Nintendo, or Game Freak. Pokémon and Pokémon GO are registered trademarks of their respective owners. This
+        is an independent, unofficial fan project.
       </p>
     </footer>
   );

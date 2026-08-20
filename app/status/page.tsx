@@ -21,10 +21,10 @@ const STATUS_CONFIG: Record<
   SiteStatusValue,
   { label: string; color: string; Icon: typeof CheckCircle2 }
 > = {
-  operational: { label: 'Todo funciona con normalidad', color: '#22C55E', Icon: CheckCircle2 },
-  degraded: { label: 'Estamos experimentando algunos problemas', color: '#FFCB05', Icon: AlertTriangle },
-  maintenance: { label: 'En mantenimiento programado', color: '#2E9BF5', Icon: Wrench },
-  down: { label: 'El servicio no está disponible temporalmente', color: '#FF3D3D', Icon: XCircle },
+  operational: { label: 'Everything is running normally', color: '#22C55E', Icon: CheckCircle2 },
+  degraded: { label: 'We are experiencing some issues', color: '#FFCB05', Icon: AlertTriangle },
+  maintenance: { label: 'Under scheduled maintenance', color: '#2E9BF5', Icon: Wrench },
+  down: { label: 'The service is temporarily unavailable', color: '#FF3D3D', Icon: XCircle },
 };
 
 async function getSiteStatus(): Promise<SiteStatusRow | null> {
@@ -59,11 +59,11 @@ export default async function StatusPage() {
           className="mb-6 flex items-center gap-1.5 text-xs font-semibold text-[#8792A0] transition hover:text-[#F4F6F8]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al feed
+          Back to feed
         </Link>
 
         <div className="rounded-2xl border border-[#232D38] bg-[#131A22] p-6">
-          <h1 className="mb-5 text-center text-base font-extrabold tracking-tight">Estado del sitio</h1>
+          <h1 className="mb-5 text-center text-base font-extrabold tracking-tight">Site Status</h1>
 
           <div className="flex flex-col items-center text-center">
             <div
@@ -76,7 +76,7 @@ export default async function StatusPage() {
             <div className="mt-3 flex items-center gap-2">
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
               <p className="text-sm font-bold" style={{ color }}>
-                {config?.label ?? 'Estado desconocido'}
+                {config?.label ?? 'Unknown status'}
               </p>
             </div>
 
@@ -87,7 +87,7 @@ export default async function StatusPage() {
             )}
 
             <p className="mt-4 text-[10px] text-[#5C6773]">
-              {siteStatus ? `Última actualización: ${timeAgo(siteStatus.updated_at)}` : 'No se pudo cargar el estado.'}
+              {siteStatus ? `Last updated: ${timeAgo(siteStatus.updated_at)}` : 'Could not load status.'}
             </p>
           </div>
         </div>

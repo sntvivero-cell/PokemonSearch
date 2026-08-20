@@ -154,8 +154,8 @@ export default function SavedTradesPage() {
               <Bookmark className="h-4 w-4 text-[#FFCB05]" />
             </div>
             <div>
-              <h1 className="text-base font-extrabold tracking-tight">Guardados</h1>
-              <p className="text-xs text-[#5C6773]">Publicaciones que marcaste para encontrar después</p>
+              <h1 className="text-base font-extrabold tracking-tight">Saved</h1>
+              <p className="text-xs text-[#5C6773]">Posts you bookmarked to find later</p>
             </div>
           </div>
         </div>
@@ -170,23 +170,23 @@ export default function SavedTradesPage() {
           </div>
         ) : loadError ? (
           <p className="rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
-            No se pudieron cargar tus guardados: {loadError}
+            Could not load your saved posts: {loadError}
           </p>
         ) : entries.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#232D38] py-20 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFCB05]/10">
               <Bookmark className="h-5 w-5 text-[#FFCB05]" />
             </div>
-            <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">Todavía no guardaste ninguna publicación</p>
+            <p className="mt-4 text-sm font-semibold text-[#F4F6F8]">You haven&apos;t saved any posts yet</p>
             <p className="mt-1 max-w-xs text-xs text-[#5C6773]">
-              Usá el ícono de marcador en cualquier publicación del feed para guardarla acá y encontrarla después.
+              Use the bookmark icon on any post in the feed to save it here and find it later.
             </p>
             <Link
               href="/"
               className="mt-5 rounded-full bg-[#2E9BF5] px-5 py-2 text-xs font-semibold text-white
                          transition hover:bg-[#2589db]"
             >
-              Explorar el feed
+              Browse the feed
             </Link>
           </div>
         ) : (

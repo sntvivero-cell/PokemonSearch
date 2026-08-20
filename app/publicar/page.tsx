@@ -18,7 +18,7 @@ export default function PublishTradePage() {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   async function handleSubmit(values: TradeFormValues): Promise<string | null> {
-    if (!user) return 'Necesitás iniciar sesión para publicar.';
+    if (!user) return 'You need to sign in to post.';
 
     const offering = configuredSlots(values.offering);
     const seeking = configuredSlots(values.seeking);
@@ -35,7 +35,7 @@ export default function PublishTradePage() {
         ),
       ]);
     } catch (err) {
-      return err instanceof Error ? err.message : 'No se pudo preparar alguna de las variantes.';
+      return err instanceof Error ? err.message : 'Could not prepare one of the variants.';
     }
 
     // Quantity y notes se guardan duplicados en todas las filas del grupo (criterio más
@@ -69,9 +69,9 @@ export default function PublishTradePage() {
       p_rows: rows,
     });
     if (rpcError) {
-      const cooldownMessage = cooldownMessageFromRpcError(rpcError, 'publicar');
+      const cooldownMessage = cooldownMessageFromRpcError(rpcError, 'post');
       if (cooldownMessage) return cooldownMessage;
-      return `No se pudo publicar el trade: ${rpcError.message}`;
+      return `Could not post the trade: ${rpcError.message}`;
     }
 
     setShowSuccessToast(true);
@@ -93,8 +93,8 @@ export default function PublishTradePage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="text-base font-extrabold tracking-tight">Publicar trade</h1>
-            <p className="text-xs text-[#5C6773]">Indica qué ofreces y qué buscas a cambio</p>
+            <h1 className="text-base font-extrabold tracking-tight">Post trade</h1>
+            <p className="text-xs text-[#5C6773]">Indicate what you&apos;re offering and looking for</p>
           </div>
         </div>
       </header>
@@ -103,14 +103,14 @@ export default function PublishTradePage() {
         isUserReady={!isUserLoading}
         isLoggedIn={!!user}
         userId={user?.id ?? null}
-        cooldownActionVerb="publicar"
-        submitLabel="Publicar trade"
-        submittingLabel="Publicando…"
+        cooldownActionVerb="post"
+        submitLabel="Post trade"
+        submittingLabel="Posting…"
         onSubmit={handleSubmit}
         cancelHref="/"
       />
 
-      {showSuccessToast && <Toast message="Trade publicado. Redirigiendo…" />}
+      {showSuccessToast && <Toast message="Trade posted. Redirecting…" />}
     </main>
   );
 }
