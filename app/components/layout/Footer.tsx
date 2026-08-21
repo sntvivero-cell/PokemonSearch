@@ -30,6 +30,9 @@ export function Footer() {
         <Link href="/status" className="transition hover:text-[#F4F6F8]">
           Site Status
         </Link>
+        <Link href="/guide" className="transition hover:text-[#F4F6F8]">
+          Trading Guide
+        </Link>
         <a
           href="https://www.tiktok.com/@gotraderz.oficial"
           target="_blank"
