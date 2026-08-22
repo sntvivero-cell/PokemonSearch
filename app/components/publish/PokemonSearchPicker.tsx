@@ -117,6 +117,7 @@ export function PokemonSearchPicker({ onSelect, accent = 'blue' }: PokemonSearch
                   alt={pokemon.name}
                   fill
                   sizes="48px"
+                  unoptimized
                   className="object-contain"
                 />
               </div>

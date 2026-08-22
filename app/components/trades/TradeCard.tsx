@@ -65,6 +65,7 @@ function VariantThumb({ variant }: { variant: PokemonVariant }) {
           alt={pokemon.name}
           fill
           sizes="48px"
+          unoptimized
           className={`object-contain ${variant.is_shiny ? 'drop-shadow-[0_0_5px_#FFCB05aa]' : ''}`}
         />
       </div>

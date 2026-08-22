@@ -374,6 +374,7 @@ export default async function TradingGuidePage() {
                         alt={p.label}
                         width={48}
                         height={48}
+                        unoptimized
                         className="h-12 w-12 object-contain"
                       />
                     ) : (

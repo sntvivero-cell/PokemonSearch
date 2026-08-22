@@ -143,6 +143,7 @@ export function PokemonDetailPopover({ variant, children, className }: PokemonDe
               alt={pokemon.name}
               fill
               sizes="80px"
+              unoptimized
               className={`object-contain ${variant.is_shiny ? 'drop-shadow-[0_0_8px_#FFCB05aa]' : ''}`}
             />
           </div>

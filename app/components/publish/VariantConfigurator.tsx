@@ -96,6 +96,7 @@ export function VariantConfigurator({
               alt={pokemon.name}
               fill
               sizes="56px"
+              unoptimized
               className={`object-contain ${isShiny ? 'drop-shadow-[0_0_6px_#FFCB05aa]' : ''}`}
             />
           </div>
