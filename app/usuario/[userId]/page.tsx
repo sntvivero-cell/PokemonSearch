@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MessageCircle, Settings, Sparkles, User } from 'lucide-react';
+import { ArrowLeft, Flag, MessageCircle, Settings, ShieldOff, Sparkles, User } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { useUser } from '@/app/hooks/useUser';
 import { TRADE_SELECT, groupTradeRows, type RawTradeRow } from '@/app/lib/tradeGrouping';
@@ -29,18 +29,40 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
   const [username, setUsername] = useState<string | null>(null);
   const [friendCode, setFriendCode] = useState<string | null>(null);
   const [rank, setRank] = useState<string | null>(null);
+  const [tradesCompleted, setTradesCompleted] = useState(0);
   const [trades, setTrades] = useState<TradePost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [savedTradeGroupIds, setSavedTradeGroupIds] = useState<Set<string>>(new Set());
+
+  // null mientras no se sabe todavía (evita mostrar "Block" un instante antes de
+  // confirmar que ya estaba bloqueado, lo que haría parpadear el botón).
+  const [isBlocked, setIsBlocked] = useState<boolean | null>(null);
+  const [isTogglingBlock, setIsTogglingBlock] = useState(false);
+  const [blockError, setBlockError] = useState<string | null>(null);
+
+  const [isReportFormOpen, setIsReportFormOpen] = useState(false);
+  const [reportReason, setReportReason] = useState<'spam' | 'scam' | 'harassment' | 'other'>('spam');
+  const [reportDetails, setReportDetails] = useState('');
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
+  const [reportSubmitted, setReportSubmitted] = useState(false);
 
   useEffect(() => {
     async function load() {
       setIsLoading(true);
       setLoadError(null);
 
-      const [{ data: profile, error: profileError }, { data: tradeRows, error: tradesError }] = await Promise.all([
+      const [
+        { data: profile, error: profileError },
+        { data: completedRow, error: completedError },
+        { data: tradeRows, error: tradesError },
+      ] = await Promise.all([
         supabase.from('profiles_with_rank').select('username, friend_code, rank').eq('user_id', userId).maybeSingle(),
+        // Aparte de profiles_with_rank (migración 0008): esa vista no expone
+        // total_trades_completed, y no hace falta tocarla para agregar esto — es un
+        // segundo SELECT chico sobre `profiles`, que ya tiene SELECT público.
+        supabase.from('profiles').select('total_trades_completed').eq('user_id', userId).maybeSingle(),
         supabase
           .from('user_trades')
           .select(TRADE_SELECT)
@@ -52,9 +74,13 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
       if (profileError) {
         console.error('Error fetching profile:', profileError.message);
       }
+      if (completedError) {
+        console.error('Error fetching total_trades_completed:', completedError.message);
+      }
       setUsername(profile?.username ?? null);
       setFriendCode(profile?.friend_code ?? null);
       setRank(profile?.rank ?? null);
+      setTradesCompleted(completedRow?.total_trades_completed ?? 0);
 
       if (tradesError) {
         setLoadError(tradesError.message);
@@ -81,6 +107,28 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
     loadSaved();
   }, [currentUser]);
 
+  useEffect(() => {
+    async function loadBlockedStatus() {
+      if (!currentUser || isOwnProfile) {
+        setIsBlocked(null);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('blocked_users')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .eq('blocked_user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching block status:', error.message);
+        return;
+      }
+      setIsBlocked(data != null);
+    }
+    loadBlockedStatus();
+  }, [currentUser, isOwnProfile, userId]);
+
   function handleDeleted(tradeGroupId: string) {
     setTrades((prev) => prev.filter((t) => t.trade_group_id !== tradeGroupId));
   }
@@ -106,6 +154,70 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
       setConversationError(err instanceof Error ? err.message : 'Could not open the conversation.');
       setIsStartingConversation(false);
     }
+  }
+
+  async function handleToggleBlock() {
+    if (!currentUser) return;
+
+    if (!isBlocked) {
+      const confirmed = window.confirm(
+        `Block ${username ?? 'this trainer'}? You won't be able to message each other anymore.`
+      );
+      if (!confirmed) return;
+    }
+
+    setBlockError(null);
+    setIsTogglingBlock(true);
+
+    if (isBlocked) {
+      const { error } = await supabase
+        .from('blocked_users')
+        .delete()
+        .eq('user_id', currentUser.id)
+        .eq('blocked_user_id', userId);
+
+      setIsTogglingBlock(false);
+      if (error) {
+        setBlockError('Could not unblock user.');
+        return;
+      }
+      setIsBlocked(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from('blocked_users')
+      .insert({ user_id: currentUser.id, blocked_user_id: userId });
+
+    setIsTogglingBlock(false);
+    if (error) {
+      setBlockError('Could not block user.');
+      return;
+    }
+    setIsBlocked(true);
+  }
+
+  async function handleSubmitReport() {
+    if (!currentUser) return;
+
+    setReportError(null);
+    setIsSubmittingReport(true);
+
+    const { error } = await supabase.from('user_reports').insert({
+      reporter_id: currentUser.id,
+      reported_user_id: userId,
+      reason: reportReason,
+      details: reportDetails.trim() || null,
+    });
+
+    setIsSubmittingReport(false);
+
+    if (error) {
+      setReportError('Could not submit the report.');
+      return;
+    }
+
+    setReportSubmitted(true);
   }
 
   return (
@@ -135,7 +247,18 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#5C6773]">Active posts</p>
+              <p className="text-xs text-[#5C6773]">
+                Active posts
+                {!isLoading && tradesCompleted > 0 && (
+                  <>
+                    {' '}
+                    ·{' '}
+                    <span className="text-[#22C55E]">
+                      {tradesCompleted} trade{tradesCompleted === 1 ? '' : 's'} completed
+                    </span>
+                  </>
+                )}
+              </p>
             </div>
           </div>
 
@@ -170,6 +293,96 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
             {conversationError}
           </p>
         )}
+
+        {!isOwnProfile && currentUser && (
+          <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 pb-3 text-[11px] font-semibold text-[#5C6773]">
+            <button
+              type="button"
+              onClick={handleToggleBlock}
+              disabled={isTogglingBlock || isBlocked === null}
+              className="flex items-center gap-1.5 transition hover:text-[#FF3D3D] disabled:cursor-not-allowed
+                         disabled:opacity-50"
+            >
+              <ShieldOff className="h-3 w-3" />
+              {isTogglingBlock ? 'Please wait…' : isBlocked ? 'Unblock user' : 'Block user'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsReportFormOpen((open) => !open);
+                setReportSubmitted(false);
+                setReportError(null);
+              }}
+              className="flex items-center gap-1.5 transition hover:text-[#F4F6F8]"
+            >
+              <Flag className="h-3 w-3" />
+              Report user
+            </button>
+          </div>
+        )}
+
+        {blockError && (
+          <p className="mx-auto max-w-6xl px-4 pb-2 text-[10px] font-semibold text-[#FF3D3D]">{blockError}</p>
+        )}
+
+        {isReportFormOpen && (
+          <div className="mx-auto max-w-6xl px-4 pb-4">
+            <div className="rounded-xl border border-[#232D38] bg-[#131A22] p-3">
+              {reportSubmitted ? (
+                <p className="text-xs font-semibold text-[#22C55E]">
+                  Report sent. Thank you for helping keep the community safe.
+                </p>
+              ) : (
+                <>
+                  <label className="mb-1 block text-[10px] font-semibold text-[#8792A0]">Reason</label>
+                  <select
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value as typeof reportReason)}
+                    className="mb-2 w-full rounded-lg border border-[#232D38] bg-[#0B0F14] px-2.5 py-1.5 text-xs
+                               text-[#F4F6F8] outline-none focus:border-[#2E9BF5]"
+                  >
+                    <option value="spam">Spam</option>
+                    <option value="scam">Scam or fraud</option>
+                    <option value="harassment">Harassment</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <label className="mb-1 block text-[10px] font-semibold text-[#8792A0]">Details (optional)</label>
+                  <textarea
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    rows={2}
+                    placeholder="Anything that helps us understand what happened…"
+                    className="mb-2 w-full resize-none rounded-lg border border-[#232D38] bg-[#0B0F14] px-2.5 py-1.5
+                               text-xs text-[#F4F6F8] placeholder:text-[#5C6773] outline-none
+                               focus:border-[#2E9BF5]"
+                  />
+                  {reportError && (
+                    <p className="mb-2 text-[10px] font-semibold text-[#FF3D3D]">{reportError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsReportFormOpen(false)}
+                      className="flex-1 rounded-full border border-[#232D38] px-3 py-1.5 text-[11px] font-semibold
+                                 text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmitReport}
+                      disabled={isSubmittingReport}
+                      className="flex-1 rounded-full bg-[#FF3D3D] px-3 py-1.5 text-[11px] font-semibold text-white
+                                 transition hover:bg-[#e63636] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {isSubmittingReport ? 'Submitting…' : 'Submit report'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-6">
@@ -200,6 +413,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                 trade={trade}
                 currentUserId={currentUser?.id ?? null}
                 onDeleted={handleDeleted}
+                onCompleted={handleDeleted}
                 isSaved={savedTradeGroupIds.has(trade.trade_group_id)}
                 onSaveChange={handleSaveChange}
               />

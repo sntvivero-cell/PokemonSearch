@@ -40,6 +40,9 @@ export default function HomePage() {
   const [unreadConversations, setUnreadConversations] = useState(0);
   const [showWelcomeToast, setShowWelcomeToast] = useState(false);
   const [savedTradeGroupIds, setSavedTradeGroupIds] = useState<Set<string>>(new Set());
+  // Solo tu propio lado del bloqueo (a quién bloqueaste vos) — si alguien te bloqueó a
+  // vos, tus posts siguen visibles para el resto, el bloqueo acá es unidireccional.
+  const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set());
   // Menú "☰" que agrupa Mensajes/Guardados/Configuración/idioma en mobile (<md) — en
   // desktop esos mismos links se muestran siempre en la fila, este estado no se usa.
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -84,6 +87,22 @@ export default function HomePage() {
       setSavedTradeGroupIds(await fetchSavedTradeGroupIds(user.id));
     }
     loadSaved();
+  }, [user]);
+
+  useEffect(() => {
+    async function loadBlocked() {
+      if (!user) {
+        setBlockedUserIds(new Set());
+        return;
+      }
+      const { data, error } = await supabase.from('blocked_users').select('blocked_user_id').eq('user_id', user.id);
+      if (error) {
+        console.error('Error fetching blocked users:', error.message);
+        return;
+      }
+      setBlockedUserIds(new Set((data ?? []).map((row) => row.blocked_user_id as string)));
+    }
+    loadBlocked();
   }, [user]);
 
   function handleSaveChange(tradeGroupId: string, isSaved: boolean) {
@@ -139,10 +158,11 @@ export default function HomePage() {
   }
 
   const filteredTrades = useMemo(() => {
+    const visibleTrades = trades.filter((trade) => !blockedUserIds.has(trade.user_id));
     const normalizedQuery = normalize(debouncedSearch.trim());
-    if (!normalizedQuery) return trades;
-    return trades.filter((trade) => tradeMatchesQuery(trade, normalizedQuery));
-  }, [trades, debouncedSearch]);
+    if (!normalizedQuery) return visibleTrades;
+    return visibleTrades.filter((trade) => tradeMatchesQuery(trade, normalizedQuery));
+  }, [trades, debouncedSearch, blockedUserIds]);
 
   return (
     <main className="min-h-screen bg-[#0B0F14] text-[#F4F6F8]">
@@ -384,6 +404,7 @@ export default function HomePage() {
                 trade={trade}
                 currentUserId={user?.id ?? null}
                 onDeleted={handleDeleted}
+                onCompleted={handleDeleted}
                 isSaved={savedTradeGroupIds.has(trade.trade_group_id)}
                 onSaveChange={handleSaveChange}
               />

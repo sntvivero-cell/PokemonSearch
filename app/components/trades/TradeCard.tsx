@@ -15,6 +15,7 @@ import {
   HelpCircle,
   MessageCircle,
   Bookmark,
+  CheckCircle2,
 } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { timeAgo } from '@/app/lib/timeAgo';
@@ -28,6 +29,12 @@ interface TradeCardProps {
   // Sin usuario logueado no se muestra "Editar"/"Eliminar", aunque el post sea propio.
   currentUserId?: string | null;
   onDeleted?: (tradeGroupId: string) => void;
+  // Igual efecto visual que onDeleted (sacar la card de la lista local: el feed ya
+  // filtra por status='active', así que un post completado desaparece de ahí solo),
+  // pero es una llamada distinta (mark_trade_completed(), no un DELETE) — se separa el
+  // callback para que cada page.tsx pueda loguear/reaccionar distinto si hace falta,
+  // aunque hoy ambos padres le pasan la misma función.
+  onCompleted?: (tradeGroupId: string) => void;
   // Estado inicial conocido por el padre (bulk fetch vía fetchSavedTradeGroupIds, ver
   // app/lib/savedTrades.ts) — evita que cada card haga su propia consulta a
   // saved_trades. Si se omite (ej. todavía no resolvió), arranca en "no guardado".
@@ -125,12 +132,21 @@ function VariantSide({ variants, openToOffers }: { variants: PokemonVariant[]; o
   );
 }
 
-export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChange }: TradeCardProps) {
+export function TradeCard({
+  trade,
+  currentUserId,
+  onDeleted,
+  onCompleted,
+  isSaved,
+  onSaveChange,
+}: TradeCardProps) {
   const isOwner = currentUserId != null && trade.user_id === currentUserId;
   const router = useRouter();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
   const [conversationError, setConversationError] = useState<string | null>(null);
   // `isSaved` llega del padre y puede resolverse recién después del primer render (el
@@ -236,6 +252,29 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
     onDeleted?.(trade.trade_group_id);
   }
 
+  async function handleMarkCompleted() {
+    const confirmed = window.confirm(
+      'Mark this post as completed? It will be removed from the active feed. This action cannot be undone.'
+    );
+    if (!confirmed) return;
+
+    setCompleteError(null);
+    setIsCompleting(true);
+
+    const { error } = await supabase.rpc('mark_trade_completed', {
+      p_trade_group_id: trade.trade_group_id,
+    });
+
+    setIsCompleting(false);
+
+    if (error) {
+      setCompleteError(`Could not mark as completed: ${error.message}`);
+      return;
+    }
+
+    onCompleted?.(trade.trade_group_id);
+  }
+
   return (
     <article className="rounded-2xl border border-[#232D38] bg-[#131A22] p-4 transition-colors hover:border-[#3A4C63]">
       {(trade.is_spoofer || trade.trinket_choice !== 'none') && (
@@ -338,27 +377,41 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
       </div>
 
       {isOwner && (
-        <div className="mt-2.5 flex gap-2 border-t border-[#232D38] pt-2.5">
-          <Link
-            href={`/publicar/${trade.trade_group_id}/editar`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#232D38]
-                       px-3 py-1.5 text-[11px] font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
-                       hover:text-[#F4F6F8]"
-          >
-            <Pencil className="h-3 w-3" />
-            Edit
-          </Link>
+        <div className="mt-2.5 border-t border-[#232D38] pt-2.5">
+          <div className="flex gap-2">
+            <Link
+              href={`/publicar/${trade.trade_group_id}/editar`}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#232D38]
+                         px-3 py-1.5 text-[11px] font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
+                         hover:text-[#F4F6F8]"
+            >
+              <Pencil className="h-3 w-3" />
+              Edit
+            </Link>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full border
+                         border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-1.5 text-[11px] font-semibold
+                         text-[#FF3D3D] transition hover:bg-[#FF3D3D]/20 disabled:cursor-not-allowed
+                         disabled:opacity-50"
+            >
+              <Trash2 className="h-3 w-3" />
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </button>
+          </div>
           <button
             type="button"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full border
-                       border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-1.5 text-[11px] font-semibold
-                       text-[#FF3D3D] transition hover:bg-[#FF3D3D]/20 disabled:cursor-not-allowed
+            onClick={handleMarkCompleted}
+            disabled={isCompleting}
+            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-full border
+                       border-[#22C55E]/40 bg-[#22C55E]/10 px-3 py-1.5 text-[11px] font-semibold
+                       text-[#22C55E] transition hover:bg-[#22C55E]/20 disabled:cursor-not-allowed
                        disabled:opacity-50"
           >
-            <Trash2 className="h-3 w-3" />
-            {isDeleting ? 'Deleting…' : 'Delete'}
+            <CheckCircle2 className="h-3 w-3" />
+            {isCompleting ? 'Marking as completed…' : 'Mark as completed'}
           </button>
         </div>
       )}
@@ -366,6 +419,12 @@ export function TradeCard({ trade, currentUserId, onDeleted, isSaved, onSaveChan
       {deleteError && (
         <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
           {deleteError}
+        </p>
+      )}
+
+      {completeError && (
+        <p className="mt-2 rounded-lg border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-2 py-1.5 text-[10px] font-semibold text-[#FF3D3D]">
+          {completeError}
         </p>
       )}
 
