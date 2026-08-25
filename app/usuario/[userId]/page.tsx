@@ -223,51 +223,53 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
   return (
     <main className="min-h-screen bg-[#0B0F14] text-[#F4F6F8]">
       <header className="sticky top-0 z-10 border-b border-[#232D38] bg-[#0B0F14]/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-4">
-          <Link
-            href="/"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#232D38]
-                       text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2E9BF5]/10">
-              <User className="h-4 w-4 text-[#2E9BF5]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-base font-extrabold tracking-tight">
-                  {isLoading ? 'Loading…' : (username ?? 'Trainer')}
-                </h1>
-                {!isLoading && <RankBadge rank={rank} />}
-                {!isLoading && friendCode && (
-                  <span className="rounded-full bg-[#232D38] px-2 py-0.5 text-[10px] font-semibold text-[#8792A0]">
-                    {friendCode}
-                  </span>
-                )}
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 md:flex-row md:items-center">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#232D38]
+                         text-[#8792A0] transition hover:border-[#3A4C63] hover:text-[#F4F6F8]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2E9BF5]/10">
+                <User className="h-4 w-4 text-[#2E9BF5]" />
               </div>
-              <p className="text-xs text-[#5C6773]">
-                Active posts
-                {!isLoading && tradesCompleted > 0 && (
-                  <>
-                    {' '}
-                    ·{' '}
-                    <span className="text-[#22C55E]">
-                      {tradesCompleted} trade{tradesCompleted === 1 ? '' : 's'} completed
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <h1 className="text-base font-extrabold tracking-tight">
+                    {isLoading ? 'Loading…' : (username ?? 'Trainer')}
+                  </h1>
+                  {!isLoading && <RankBadge rank={rank} />}
+                  {!isLoading && friendCode && (
+                    <span className="rounded-full bg-[#232D38] px-2 py-0.5 text-[10px] font-semibold text-[#8792A0]">
+                      {friendCode}
                     </span>
-                  </>
-                )}
-              </p>
+                  )}
+                </div>
+                <p className="text-xs text-[#5C6773]">
+                  Active posts
+                  {!isLoading && tradesCompleted > 0 && (
+                    <>
+                      {' '}
+                      ·{' '}
+                      <span className="text-[#22C55E]">
+                        {tradesCompleted} trade{tradesCompleted === 1 ? '' : 's'} completed
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
 
           {!isLoading && isOwnProfile && (
             <Link
               href="/configuracion"
-              className="ml-auto flex items-center gap-1.5 rounded-full border border-[#232D38] px-4 py-2
-                         text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
-                         hover:text-[#F4F6F8]"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full border border-[#232D38]
+                         px-4 py-2 text-xs font-semibold text-[#8792A0] transition hover:border-[#3A4C63]
+                         hover:text-[#F4F6F8] md:ml-auto md:w-auto"
             >
               <Settings className="h-3.5 w-3.5" />
               Edit profile
@@ -279,9 +281,9 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
               type="button"
               onClick={handleSendMessage}
               disabled={isStartingConversation}
-              className="ml-auto flex items-center gap-1.5 rounded-full bg-[#2E9BF5] px-4 py-2 text-xs
-                         font-semibold text-white transition hover:bg-[#2589db] disabled:cursor-not-allowed
-                         disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-[#2E9BF5] px-4 py-2
+                         text-xs font-semibold text-white transition hover:bg-[#2589db] disabled:cursor-not-allowed
+                         disabled:opacity-50 md:ml-auto md:w-auto"
             >
               <MessageCircle className="h-3.5 w-3.5" />
               {isStartingConversation ? 'Opening…' : 'Send message'}

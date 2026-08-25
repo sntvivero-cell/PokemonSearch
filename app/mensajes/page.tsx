@@ -98,7 +98,9 @@ export default function MessagesListPage() {
                       c.hasUnread ? 'font-semibold text-[#8792A0]' : 'text-[#5C6773]'
                     }`}
                   >
-                    {c.lastMessage ? c.lastMessage.content : 'No messages yet'}
+                    {c.lastMessage
+                      ? (c.lastMessage.content ?? (c.lastMessage.image_url ? '📷 Image' : ''))
+                      : 'No messages yet'}
                   </p>
                 </div>
                 {c.hasUnread && <span className="h-2 w-2 shrink-0 rounded-full bg-[#2E9BF5]" />}

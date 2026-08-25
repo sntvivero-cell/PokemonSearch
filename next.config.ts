@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.pokeapi.co',
       },
+      {
+        // Signed URLs de imágenes del chat (bucket privado "chat-images") — ver
+        // app/lib/chatImages.ts.
+        protocol: 'https',
+        hostname: 'rplcfsphdbeeletbfpom.supabase.co',
+      },
     ],
   },
 };

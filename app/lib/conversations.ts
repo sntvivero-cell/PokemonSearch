@@ -109,7 +109,7 @@ export async function fetchConversationSummaries(userId: string): Promise<Conver
       conversationIds.map(async (id) => {
         const { data } = await supabase
           .from('messages')
-          .select('content, created_at, sender_id')
+          .select('content, image_url, created_at, sender_id')
           .eq('conversation_id', id)
           .order('created_at', { ascending: false })
           .limit(1)
