@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { supabaseUrl } from '@/app/lib/supabaseClient';
 
-// Borrado físico de posts inactivos hace más de 7 días. Pensado para ser disparado
+// Borrado físico de posts inactivos hace más de 15 días. Pensado para ser disparado
 // por un cron EXTERNO (cron-job.org, GitHub Actions schedule, etc.) una vez al día —
 // no hay pg_cron disponible en el plan de Supabase, y un cron interno de Next.js
 // (setInterval, node-cron) no es confiable en un entorno serverless como Vercel: el
@@ -38,12 +38,12 @@ export async function GET(request: NextRequest) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await supabaseAdmin
     .from('user_trades')
     .delete()
-    .lt('updated_at', sevenDaysAgo)
+    .lt('updated_at', fifteenDaysAgo)
     .select('id');
 
   if (error) {
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     deletedCount: data?.length ?? 0,
-    cutoff: sevenDaysAgo,
+    cutoff: fifteenDaysAgo,
     ranAt: new Date().toISOString(),
   });
 }

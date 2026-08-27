@@ -113,6 +113,47 @@ const ALLOWED_ORPHAN_FORMS: Record<string, string> = {
   // vía regionForms si la fuente las trae ahí, no por este mecanismo.
 };
 
+// Formas donde NO hay absolutamente ninguna fuente en la API (ni regionForm, ni mega,
+// ni entrada suelta en assetForms) — a diferencia de ALLOWED_ORPHAN_FORMS de arriba,
+// acá no hay nada que "encontrar" y capturar. Caso confirmado: Apex Shadow
+// Lugia/Ho-Oh (GO Tour: Johto 2022). Se investigó a fondo contra
+// pokemon-go-api/pokedex.json (sin rastro de "Apex" en regionForms/megaEvolutions/
+// assetForms de ninguno de los dos) y contra PokeMiners/pogo_assets completo (sin
+// ningún ícono con sufijo "apex" para ningún Pokémon) — el juego nunca tuvo arte
+// propia para el estado Apex Shadow porque es visualmente idéntico a un Shadow
+// normal (la diferencia es un flag de servidor: IVs bloqueados en máximo, no
+// purificable, no arte nueva). Por eso el sprite se resuelve dinámicamente contra el
+// form 'S' (Shadow) YA cargado de la misma especie en el pokedex descargado, en vez de
+// un literal hardcodeado — así no queda desactualizado si pokemon-go-api cambia de
+// host o de nombre de archivo.
+const HARDCODED_APEX_SHADOW_FORMS: { dexNumber: number; name: string; types: string[] }[] = [
+  { dexNumber: 249, name: 'Apex Shadow Lugia', types: ['psychic', 'flying'] },
+  { dexNumber: 250, name: 'Apex Shadow Ho-Oh', types: ['fire', 'flying'] },
+];
+
+function buildApexShadowRows(pokedex: ApiPokemon[]): PokemonRow[] {
+  const rows: PokemonRow[] = [];
+
+  for (const target of HARDCODED_APEX_SHADOW_FORMS) {
+    const p = pokedex.find((x) => x.dexNr === target.dexNumber);
+    if (!p || !p.regionForms || Array.isArray(p.regionForms)) continue;
+
+    const shadowForm = Object.values(p.regionForms).find((f) => f.formId.endsWith('_S'));
+    if (!shadowForm?.assets) continue;
+
+    rows.push({
+      dex_number: target.dexNumber,
+      name: target.name,
+      form: 'Apex Shadow',
+      types: target.types,
+      sprite_url: shadowForm.assets.image ?? null,
+      shiny_sprite_url: shadowForm.assets.shinyImage ?? null,
+    });
+  }
+
+  return rows;
+}
+
 // `regionForms`/`megaEvolutions` a veces traen `assets: null` (ej. las 26 letras de
 // Unown) aunque el sprite SÍ existe en el array `assetForms` del Pokémon base — ahí
 // queda indexado por su form key completa (ej. "UNOWN_A") o por el sufijo solo (ej.
@@ -211,6 +252,8 @@ function buildRows(pokedex: ApiPokemon[]): PokemonRow[] {
     // también como `form` duplicaría el concepto.
   }
 
+  rows.push(...buildApexShadowRows(pokedex));
+
   return rows;
 }
 
@@ -240,14 +283,22 @@ async function seedPokemonGo() {
 
   const rows = buildRows(pokedex);
   const orphanRows = buildOrphanRows(pokedex);
-  console.log(`${rows.length} filas a upsertear (base + formas alternativas + megas + formas huérfanas).`);
+  const apexShadowRows = buildApexShadowRows(pokedex);
+  console.log(`${rows.length} filas a upsertear (base + formas alternativas + megas + formas huérfanas + formas Apex Shadow hardcodeadas).`);
   console.log(`De esas, ${orphanRows.length} son formas huérfanas nuevas detectadas por el criterio ampliado (assetForms sin region form/mega asociado).`);
+  console.log(`De esas, ${apexShadowRows.length} son formas Apex Shadow hardcodeadas (sin fuente propia en la API, sprite reusado del form 'S' de la misma especie).`);
 
   if (dryRun) {
     console.log('\n--- DRY RUN: no se escribió nada en la base ---');
     console.log(`Formas huérfanas detectadas: ${orphanRows.length}`);
     orphanRows.forEach((r) =>
       console.log(`  dex ${r.dex_number} | name: '${r.name}' | form: '${r.form}' | types: [${r.types.join(', ')}] | sprite: ${r.sprite_url}`)
+    );
+    console.log(`\nFormas Apex Shadow hardcodeadas: ${apexShadowRows.length}`);
+    apexShadowRows.forEach((r) =>
+      console.log(
+        `  dex ${r.dex_number} | name: '${r.name}' | form: '${r.form}' | types: [${r.types.join(', ')}] | sprite: ${r.sprite_url} | shiny: ${r.shiny_sprite_url}`
+      )
     );
     return;
   }

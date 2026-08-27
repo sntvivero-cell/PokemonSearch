@@ -18,7 +18,7 @@ import type { Pokemon } from './pokemons';
  * `updated_at` (agregada vía migración; se refresca sola con cada INSERT nuevo,
  * default now(), ya no hay UPDATE de por medio) es lo que usa
  * app/api/cleanup/route.ts (cron externo diario) para borrar físicamente los posts
- * inactivos hace más de 7 días — no hay status='expired' ni filtro por fecha en el
+ * inactivos hace más de 15 días — no hay status='expired' ni filtro por fecha en el
  * feed: un post inactivo simplemente deja de existir. También es la columna que
  * chequea la policy RESTRICTIVE de INSERT para el cooldown único de 30 minutos entre
  * publicar y editar (ver app/lib/tradeTiming.ts) — ya no existe el botón "Actualizar"
