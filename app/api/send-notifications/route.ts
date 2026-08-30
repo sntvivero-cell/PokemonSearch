@@ -70,22 +70,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Falta CRON_SECRET en las variables de entorno del servidor.' }, { status: 500 });
   }
 
-  const authHeader = request.headers.get('authorization');
+  // Header CUSTOM, no "Authorization": Supabase Studio tiene un bug conocido y sin
+  // resolver (github.com/supabase/supabase issues #38848 y #39248) donde borra
+  // silenciosamente cualquier header llamado "Authorization" de un Database Webhook,
+  // tanto al crearlo como al re-guardarlo — nunca llega a mandarse, aunque se haya
+  // tipeado bien en la UI. Cualquier otro nombre de header sí funciona (confirmado en
+  // esos issues con un header de control), por eso este endpoint usa `x-cron-secret`
+  // en vez de `Authorization: Bearer`. /api/cleanup y /api/cleanup-unconfirmed-accounts
+  // NO tienen este problema porque los dispara un cron EXTERNO (cron-job.org), no un
+  // Database Webhook de Supabase — quedan con Authorization sin cambios.
+  const providedSecret = request.headers.get('x-cron-secret');
 
-  // TEMPORAL — sacar apenas se resuelva el 401 en producción (ver conversación).
-  // No loguea ningún valor secreto completo, solo longitudes/prefijo, para poder
-  // distinguir en los logs de Vercel entre "llegó vacío", "llegó sin el prefijo
-  // Bearer", o "llegó con el prefijo pero longitud distinta a la esperada" sin
-  // exponer CRON_SECRET en texto plano.
-  console.log('[send-notifications] auth debug', {
-    headerPresent: authHeader != null,
-    headerLength: authHeader?.length ?? 0,
-    headerStartsWithBearer: authHeader?.startsWith('Bearer ') ?? false,
+  // TEMPORAL — sacar apenas se resuelva el 401. Loguea TODOS los nombres de header
+  // recibidos (para descartar que algo intermedio esté filtrando headers en general,
+  // no solo el nuestro) y las longitudes de authorization/x-cron-secret si vinieran,
+  // sin exponer ningún valor secreto completo.
+  const allHeaderNames = [...request.headers.keys()];
+  console.log('[send-notifications] headers debug', {
+    allHeaderNames,
+    hasAuthorizationHeader: request.headers.has('authorization'),
+    authorizationHeaderLength: request.headers.get('authorization')?.length ?? 0,
+    hasXCronSecretHeader: request.headers.has('x-cron-secret'),
+    xCronSecretLength: providedSecret?.length ?? 0,
     envSecretLength: cronSecret.length,
-    expectedHeaderLength: `Bearer ${cronSecret}`.length,
   });
 
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  if (providedSecret !== cronSecret) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
   }
 
