@@ -71,6 +71,20 @@ export async function POST(request: NextRequest) {
   }
 
   const authHeader = request.headers.get('authorization');
+
+  // TEMPORAL — sacar apenas se resuelva el 401 en producción (ver conversación).
+  // No loguea ningún valor secreto completo, solo longitudes/prefijo, para poder
+  // distinguir en los logs de Vercel entre "llegó vacío", "llegó sin el prefijo
+  // Bearer", o "llegó con el prefijo pero longitud distinta a la esperada" sin
+  // exponer CRON_SECRET en texto plano.
+  console.log('[send-notifications] auth debug', {
+    headerPresent: authHeader != null,
+    headerLength: authHeader?.length ?? 0,
+    headerStartsWithBearer: authHeader?.startsWith('Bearer ') ?? false,
+    envSecretLength: cronSecret.length,
+    expectedHeaderLength: `Bearer ${cronSecret}`.length,
+  });
+
   if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
   }
