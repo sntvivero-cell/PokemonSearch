@@ -166,7 +166,7 @@ declare
   v_watcher record;
   v_pokemon_id uuid;
   v_pokemon_name text;
-  r jsonb;
+  v_row jsonb;
 begin
   if v_user_id is null then
     raise exception 'No autenticado';
@@ -229,12 +229,12 @@ begin
     where user_id = v_user_id;
 
     begin
-      for r in select * from jsonb_array_elements(p_rows)
+      for v_row in select * from jsonb_array_elements(p_rows)
       loop
-        if r->>'intent' = 'for_trade' then
+        if v_row->>'intent' = 'for_trade' then
           select pv.pokemon_id into v_pokemon_id
           from pokemon_variants pv
-          where pv.id = (r->>'variant_id')::uuid;
+          where pv.id = (v_row->>'variant_id')::uuid;
 
           if v_pokemon_id is not null then
             select name into v_pokemon_name from pokemons where id = v_pokemon_id;

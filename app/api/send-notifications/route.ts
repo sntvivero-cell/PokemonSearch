@@ -70,30 +70,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Falta CRON_SECRET en las variables de entorno del servidor.' }, { status: 500 });
   }
 
-  // Header CUSTOM, no "Authorization": Supabase Studio tiene un bug conocido y sin
-  // resolver (github.com/supabase/supabase issues #38848 y #39248) donde borra
-  // silenciosamente cualquier header llamado "Authorization" de un Database Webhook,
-  // tanto al crearlo como al re-guardarlo — nunca llega a mandarse, aunque se haya
-  // tipeado bien en la UI. Cualquier otro nombre de header sí funciona (confirmado en
-  // esos issues con un header de control), por eso este endpoint usa `x-cron-secret`
-  // en vez de `Authorization: Bearer`. /api/cleanup y /api/cleanup-unconfirmed-accounts
-  // NO tienen este problema porque los dispara un cron EXTERNO (cron-job.org), no un
-  // Database Webhook de Supabase — quedan con Authorization sin cambios.
+  // Header CUSTOM, no "Authorization": la causa real del 401 que nos costó encontrar
+  // fue el redirect de gotraderz.com a www.gotraderz.com — el webhook de Supabase
+  // apuntaba a la URL sin "www", y en el salto del redirect 3xx se perdía el header
+  // Authorization (no era un bug de Supabase Studio, esa pista resultó ser un
+  // callejón sin salida). Se mantiene `x-cron-secret` en vez de volver a
+  // `Authorization` porque ya funciona y no hay motivo para tocarlo de nuevo.
+  // /api/cleanup y /api/cleanup-unconfirmed-accounts siguen con Authorization sin
+  // cambios porque los dispara un cron EXTERNO (cron-job.org) contra la URL correcta
+  // directamente, sin pasar por el redirect que causó esto.
   const providedSecret = request.headers.get('x-cron-secret');
-
-  // TEMPORAL — sacar apenas se resuelva el 401. Loguea TODOS los nombres de header
-  // recibidos (para descartar que algo intermedio esté filtrando headers en general,
-  // no solo el nuestro) y las longitudes de authorization/x-cron-secret si vinieran,
-  // sin exponer ningún valor secreto completo.
-  const allHeaderNames = [...request.headers.keys()];
-  console.log('[send-notifications] headers debug', {
-    allHeaderNames,
-    hasAuthorizationHeader: request.headers.has('authorization'),
-    authorizationHeaderLength: request.headers.get('authorization')?.length ?? 0,
-    hasXCronSecretHeader: request.headers.has('x-cron-secret'),
-    xCronSecretLength: providedSecret?.length ?? 0,
-    envSecretLength: cronSecret.length,
-  });
 
   if (providedSecret !== cronSecret) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
