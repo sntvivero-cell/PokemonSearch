@@ -33,6 +33,12 @@ export function Footer() {
         <Link href="/guide" className="transition hover:text-[#F4F6F8]">
           Trading Guide
         </Link>
+        <Link href="/watchlist" className="transition hover:text-[#F4F6F8]">
+          Watchlist
+        </Link>
+        <Link href="/leaderboard" className="transition hover:text-[#F4F6F8]">
+          Leaderboard
+        </Link>
         <a
           href="https://www.tiktok.com/@gotraderz.oficial"
           target="_blank"

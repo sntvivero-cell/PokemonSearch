@@ -25,6 +25,7 @@ export default function ConfiguracionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [friendCode, setFriendCode] = useState('');
+  const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(true);
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +50,7 @@ export default function ConfiguracionPage() {
       setIsLoading(true);
       const { data, error: profileError } = await supabase
         .from('profiles')
-        .select('username, friend_code')
+        .select('username, friend_code, email_notifications_enabled')
         .eq('user_id', user!.id)
         .maybeSingle();
 
@@ -60,6 +61,7 @@ export default function ConfiguracionPage() {
       }
       setUsername(data?.username ?? '');
       setFriendCode(data?.friend_code ?? '');
+      setEmailNotificationsEnabled(data?.email_notifications_enabled ?? true);
       setIsLoading(false);
     }
 
@@ -96,7 +98,11 @@ export default function ConfiguracionPage() {
     setIsSaving(true);
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ username: trimmedUsername, friend_code: trimmedFriendCode || null })
+      .update({
+        username: trimmedUsername,
+        friend_code: trimmedFriendCode || null,
+        email_notifications_enabled: emailNotificationsEnabled,
+      })
       .eq('user_id', user.id);
     setIsSaving(false);
 
@@ -203,6 +209,21 @@ export default function ConfiguracionPage() {
                 So others can add you as a friend in Pokémon GO. Optional.
               </p>
             </div>
+
+            <label className="flex items-center justify-between gap-3 rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2.5">
+              <span className="text-xs font-semibold text-[#8792A0]">
+                Email notifications
+                <span className="mt-0.5 block text-[10px] font-normal text-[#5C6773]">
+                  New messages and watchlist matches
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                checked={emailNotificationsEnabled}
+                onChange={(e) => setEmailNotificationsEnabled(e.target.checked)}
+                className="h-4 w-4 shrink-0 accent-[#2E9BF5]"
+              />
+            </label>
 
             {error && (
               <p className="rounded-xl border border-[#FF3D3D]/40 bg-[#FF3D3D]/10 px-3 py-2.5 text-xs font-semibold text-[#FF3D3D]">
