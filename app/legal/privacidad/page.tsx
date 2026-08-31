@@ -70,16 +70,34 @@ export default function PrivacyPolicyPage() {
           policy and ask for your explicit consent before enabling them.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">5. What we use your data for</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">5. Email notifications</h2>
+        <p className="mb-4">
+          We use your email address to send you transactional notifications: when another user sends you a
+          message, and when someone posts a trade offering a Pokémon you added to your watchlist. This is{' '}
+          <strong className="text-[#F4F6F8]">opt-out</strong>: it&apos;s on by default when you create an
+          account, and you can turn it off at any time from{' '}
+          <Link href="/configuracion" className="text-[#2E9BF5] hover:underline">
+            Settings
+          </Link>
+          , which stops both types of email immediately.{' '}
+          <strong className="text-[#F4F6F8]">
+            We never use your email for marketing, and we never share it with third parties
+          </strong>{' '}
+          — it&apos;s only used to send you these two specific notifications through our email provider (Resend),
+          acting solely as our infrastructure to deliver them.
+        </p>
+
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">6. What we use your data for</h2>
         <p className="mb-4">
           We use your data exclusively to operate the service: showing your posts and username to other
-          community members, letting them contact you via chat, and keeping you signed in.{' '}
+          community members, letting them contact you via chat, sending you the email notifications described
+          above, and keeping you signed in.{' '}
           <strong className="text-[#F4F6F8]">
             We do not sell or share your data with third parties, and we do not use it for advertising purposes.
           </strong>
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">6. Your rights</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. Your rights</h2>
         <p className="mb-2">If your data is protected by the GDPR (or an equivalent regulation), you have the right to:</p>
         <ul className="mb-4 ml-4 list-disc space-y-1">
           <li><strong className="text-[#F4F6F8]">Access</strong>: know what data of yours we have.</li>
@@ -96,13 +114,13 @@ export default function PrivacyPolicyPage() {
           stating your username or registered email.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">7. How long we keep your data</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">8. How long we keep your data</h2>
         <p className="mb-4">
           We keep your data while your account is active. If you request account deletion, we remove your
           personal data and associated posts, unless the law requires us to keep some record for longer.
         </p>
 
-        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">8. Changes to this policy</h2>
+        <h2 className="mb-2 mt-6 text-sm font-bold text-[#F4F6F8]">9. Changes to this policy</h2>
         <p className="mb-4">
           We may update this policy occasionally. If we make significant changes, we&apos;ll indicate this by
           updating the date at the top of this page.

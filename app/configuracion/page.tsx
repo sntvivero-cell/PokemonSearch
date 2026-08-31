@@ -210,18 +210,19 @@ export default function ConfiguracionPage() {
               </p>
             </div>
 
-            <label className="flex items-center justify-between gap-3 rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2.5">
+            <label className="flex items-start justify-between gap-3 rounded-lg border border-[#232D38] bg-[#0B0F14] px-3 py-2.5">
               <span className="text-xs font-semibold text-[#8792A0]">
                 Email notifications
-                <span className="mt-0.5 block text-[10px] font-normal text-[#5C6773]">
-                  New messages and watchlist matches
+                <span className="mt-1 block text-[10px] font-normal leading-relaxed text-[#5C6773]">
+                  Receive an email when someone sends you a message or posts a Pokémon you&apos;re watching on your
+                  watchlist.
                 </span>
               </span>
               <input
                 type="checkbox"
                 checked={emailNotificationsEnabled}
                 onChange={(e) => setEmailNotificationsEnabled(e.target.checked)}
-                className="h-4 w-4 shrink-0 accent-[#2E9BF5]"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[#2E9BF5]"
               />
             </label>
 
