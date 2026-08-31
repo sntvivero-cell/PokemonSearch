@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { buildPageMetadata } from '@/app/lib/seo';
 
-export const metadata = {
+export const metadata = buildPageMetadata({
   title: 'Terms of Use — GoTraderz',
-};
+  description: "The rules for using GoTraderz's Pokémon GO trading board: what's allowed, moderation, and account responsibilities.",
+  path: '/legal/terminos',
+});
 
 export default function TermsOfUsePage() {
   return (

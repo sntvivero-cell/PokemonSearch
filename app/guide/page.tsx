@@ -3,10 +3,17 @@ import Image from 'next/image';
 import { ArrowLeft, Repeat, Gift, Star, UserRound, ArrowRightLeft, ListChecks, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { TYPE_COLORS } from '@/app/types/pokemons';
+import { buildPageMetadata } from '@/app/lib/seo';
 
-export const metadata = {
-  title: 'Trading Guide — GoTraderz',
-};
+export const metadata = buildPageMetadata({
+  title: 'Pokémon GO Trading Guide: Costs, Lucky Trades & Special Trades | GoTraderz',
+  description:
+    'Everything about trading in Pokémon GO: Stardust costs by Friendship Level, Remote Trading rules, Lucky Trade odds, trade evolutions, and restrictions.',
+  path: '/guide',
+  ogTitle: 'Pokémon GO Trading Guide: Costs, Lucky Trades & Special Trades',
+  ogDescription:
+    'Stardust costs by Friendship Level, Remote Trading, Lucky Trade odds, and trade restrictions — everything about trading in Pokémon GO.',
+});
 
 const EVOLUTION_TRADE_POKEMON: { label: string; name: string; form: string }[] = [
   { label: 'Kadabra', name: 'Kadabra', form: 'Normal' },

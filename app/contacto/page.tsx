@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { ArrowLeft, Mail } from 'lucide-react';
+import { buildPageMetadata } from '@/app/lib/seo';
 
-export const metadata = {
+export const metadata = buildPageMetadata({
   title: 'Contact — GoTraderz',
-};
+  description: 'Get in touch with the GoTraderz team for questions, reports, or feedback about the trading board.',
+  path: '/contacto',
+});
 
 const CONTACT_EMAIL = 'contact@gotraderz.com';
 

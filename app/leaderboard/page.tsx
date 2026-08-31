@@ -2,10 +2,15 @@ import Link from 'next/link';
 import { ArrowLeft, Trophy } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { RankBadge } from '@/app/components/trades/RankBadge';
+import { buildPageMetadata } from '@/app/lib/seo';
 
-export const metadata = {
-  title: 'Leaderboard — GoTraderz',
-};
+export const metadata = buildPageMetadata({
+  title: 'Top Traders Leaderboard — GoTraderz',
+  description: 'See the top 20 Pokémon GO trainers on GoTraderz, ranked by completed trades — updated live.',
+  path: '/leaderboard',
+  ogTitle: 'Top Traders Leaderboard',
+  ogDescription: 'The top 20 Pokémon GO trainers on GoTraderz, ranked by completed trades.',
+});
 
 // Se refresca en cada carga: el ranking cambia con cada trade completado, no vale la
 // pena cachear una página tan barata de generar (una sola query a una vista pública).

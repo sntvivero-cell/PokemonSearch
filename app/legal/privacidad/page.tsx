@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { buildPageMetadata } from '@/app/lib/seo';
 
-export const metadata = {
+export const metadata = buildPageMetadata({
   title: 'Privacy Policy — GoTraderz',
-};
+  description: 'How GoTraderz collects, stores, and uses your data, including email notifications and your GDPR rights.',
+  path: '/legal/privacidad',
+});
 
 export default function PrivacyPolicyPage() {
   return (

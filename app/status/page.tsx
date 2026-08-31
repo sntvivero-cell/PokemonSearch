@@ -2,12 +2,19 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, AlertTriangle, Wrench, XCircle, HelpCircle } from 'lucide-react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { timeAgo } from '@/app/lib/timeAgo';
+import { buildPageMetadata } from '@/app/lib/seo';
 
 // Server component, sin 'use client': se refresca en cada carga (dynamic='force-dynamic'
 // evita que Next.js cachee el fetch) — el dato es chico y se actualiza a mano desde el
 // SQL Editor de Supabase (ver migración 0009_site_status.sql), no hace falta revalidación
 // más fina que esa.
 export const dynamic = 'force-dynamic';
+
+export const metadata = buildPageMetadata({
+  title: 'Site Status — GoTraderz',
+  description: 'Current operational status of GoTraderz — check for outages or ongoing maintenance.',
+  path: '/status',
+});
 
 type SiteStatusValue = 'operational' | 'degraded' | 'maintenance' | 'down';
 
