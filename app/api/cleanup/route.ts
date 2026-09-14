@@ -31,6 +31,20 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // STANDBY (2026-09-14, a pedido explícito): se estaba borrando más de lo que se
+  // publica — pausado hasta revisar el criterio (¿15 días es muy agresivo?, ¿hay un
+  // bug en qué cuenta como "inactivo"?) antes de volver a habilitarlo. El cron externo
+  // puede seguir pegándole a esta ruta sin problema mientras tanto: no borra nada,
+  // solo responde `skipped: true`. Para reactivar: descomentar el bloque de abajo y
+  // borrar este `return` temprano.
+  return NextResponse.json({
+    ok: true,
+    skipped: true,
+    reason: 'Cleanup en standby — ver comentario en el código.',
+    ranAt: new Date().toISOString(),
+  });
+
+  /*
   // service_role salta RLS a propósito: esta ruta corre en servidor sin sesión de
   // usuario (la dispara un cron externo), así que necesita borrar filas de
   // cualquier usuario, no solo las que auth.uid() permitiría.
@@ -56,4 +70,5 @@ export async function GET(request: NextRequest) {
     cutoff: fifteenDaysAgo,
     ranAt: new Date().toISOString(),
   });
+  */
 }
